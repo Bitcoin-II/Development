@@ -227,7 +227,7 @@ void utxo_snapshot_fuzz(FuzzBufferType buffer)
 // expensive state to be reset.
 // BitcoinII does not currently maintain the regtest AssumeUTXO fixture
 // commitments required by these inherited Bitcoin Core fuzz targets.
-FUZZ_TARGET(utxo_snapshot /*valid*/, .init = initialize_chain<false>, .hidden = true) { utxo_snapshot_fuzz<false>(buffer); }
-FUZZ_TARGET(utxo_snapshot_invalid, .init = initialize_chain<true>, .hidden = true) { utxo_snapshot_fuzz<true>(buffer); }
+FUZZ_TARGET(utxo_snapshot /*valid*/, .init = initialize_chain<false>) { utxo_snapshot_fuzz<false>(buffer); }
+FUZZ_TARGET(utxo_snapshot_invalid, .init = initialize_chain<true>) { utxo_snapshot_fuzz<true>(buffer); }
 
 } // namespace
