@@ -22,7 +22,7 @@
 #include <string_view>
 #include <vector>
 
-using namespace bc2k;
+using namespace btck;
 
 std::vector<std::byte> hex_string_to_byte_vec(std::string_view hex)
 {
@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
     std::filesystem::path abs_datadir{std::filesystem::absolute(argv[argc-1])};
     std::filesystem::create_directories(abs_datadir);
 
-    bc2k_LoggingOptions logging_options = {
+    btck_LoggingOptions logging_options = {
         .log_timestamps = true,
         .log_time_micros = false,
         .log_threadnames = false,

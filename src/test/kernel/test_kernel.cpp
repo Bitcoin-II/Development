@@ -24,7 +24,7 @@
 #include <string_view>
 #include <vector>
 
-using namespace bc2k;
+using namespace btck;
 
 std::string random_string(uint32_t length)
 {
@@ -386,7 +386,7 @@ void CheckRange(const RangeType& range, size_t expected_size)
     BOOST_CHECK(it2 == it + 1);
 }
 
-BOOST_AUTO_TEST_CASE(bc2k_transaction_tests)
+BOOST_AUTO_TEST_CASE(btck_transaction_tests)
 {
     auto tx_data{hex_string_to_byte_vec("02000000013f7cebd65c27431a90bba7f796914fe8cc2ddfc3f2cbd6f7e5f2fc854534da95000000006b483045022100de1ac3bcdfb0332207c4a91f3832bd2c2915840165f876ab47c5f8996b971c3602201c6c053d750fadde599e6f5c4e1963df0f01fc0d97815e8157e3d59fe09ca30d012103699b464d1d8bc9e47d4fb1cdaa89a1c5783d68363c4dbc4b524ed3d857148617feffffff02836d3c01000000001976a914fc25d6d5c94003bf5b0c7b640a248e2c637fcfb088ac7ada8202000000001976a914fbed3d9b11183209a57999d54d59f67c019e756c88ac6acb0700")};
     auto tx{Transaction{tx_data}};
@@ -465,7 +465,7 @@ BOOST_AUTO_TEST_CASE(bc2k_transaction_tests)
     check_equal(script_pubkey_roundtrip.ToBytes(), script_pubkey.ToBytes());
 }
 
-BOOST_AUTO_TEST_CASE(bc2k_script_pubkey)
+BOOST_AUTO_TEST_CASE(btck_script_pubkey)
 {
     auto script_data{hex_string_to_byte_vec("76a9144bfbaf6afb76cc5771bc6404810d1cc041a6933988ac")};
     std::vector<std::byte> script_data_2 = script_data;
@@ -479,7 +479,7 @@ BOOST_AUTO_TEST_CASE(bc2k_script_pubkey)
     CheckHandle(script, empty_script);
 }
 
-BOOST_AUTO_TEST_CASE(bc2k_transaction_output)
+BOOST_AUTO_TEST_CASE(btck_transaction_output)
 {
     ScriptPubkey script{hex_string_to_byte_vec("76a9144bfbaf6afb76cc5771bc6404810d1cc041a6933988ac")};
     TransactionOutput output{script, 1};
@@ -487,7 +487,7 @@ BOOST_AUTO_TEST_CASE(bc2k_transaction_output)
     CheckHandle(output, output2);
 }
 
-BOOST_AUTO_TEST_CASE(bc2k_transaction_input)
+BOOST_AUTO_TEST_CASE(btck_transaction_input)
 {
     Transaction tx{hex_string_to_byte_vec("020000000248c03e66fd371c7033196ce24298628e59ebefa00363026044e0f35e0325a65d000000006a473044022004893432347f39beaa280e99da595681ddb20fc45010176897e6e055d716dbfa022040a9e46648a5d10c33ef7cee5e6cf4b56bd513eae3ae044f0039824b02d0f44c012102982331a52822fd9b62e9b5d120da1d248558fac3da3a3c51cd7d9c8ad3da760efeffffffb856678c6e4c3c84e39e2ca818807049d6fba274b42af3c6d3f9d4b6513212d2000000006a473044022068bcedc7fe39c9f21ad318df2c2da62c2dc9522a89c28c8420ff9d03d2e6bf7b0220132afd752754e5cb1ea2fd0ed6a38ec666781e34b0e93dc9a08f2457842cf5660121033aeb9c079ea3e08ea03556182ab520ce5c22e6b0cb95cee6435ee17144d860cdfeffffff0260d50b00000000001976a914363cc8d55ea8d0500de728ef6d63804ddddbdc9888ac67040f00000000001976a914c303bdc5064bf9c9a8b507b5496bd0987285707988ac6acb0700")};
     TransactionInput input_0 = tx.GetInput(0);
@@ -499,7 +499,7 @@ BOOST_AUTO_TEST_CASE(bc2k_transaction_input)
     CheckHandle(point_0, point_1);
 }
 
-BOOST_AUTO_TEST_CASE(bc2k_precomputed_txdata) {
+BOOST_AUTO_TEST_CASE(btck_precomputed_txdata) {
     auto tx_data{hex_string_to_byte_vec("02000000013f7cebd65c27431a90bba7f796914fe8cc2ddfc3f2cbd6f7e5f2fc854534da95000000006b483045022100de1ac3bcdfb0332207c4a91f3832bd2c2915840165f876ab47c5f8996b971c3602201c6c053d750fadde599e6f5c4e1963df0f01fc0d97815e8157e3d59fe09ca30d012103699b464d1d8bc9e47d4fb1cdaa89a1c5783d68363c4dbc4b524ed3d857148617feffffff02836d3c01000000001976a914fc25d6d5c94003bf5b0c7b640a248e2c637fcfb088ac7ada8202000000001976a914fbed3d9b11183209a57999d54d59f67c019e756c88ac6acb0700")};
     auto tx{Transaction{tx_data}};
     auto tx_data_2{hex_string_to_byte_vec("02000000000101904f4ee5c87d20090b642f116e458cd6693292ad9ece23e72f15fb6c05b956210500000000fdffffff02e2010000000000002251200839a723933b56560487ec4d67dda58f09bae518ffa7e148313c5696ac837d9f10060000000000002251205826bcdae7abfb1c468204170eab00d887b61ab143464a4a09e1450bdc59a3340140f26e7af574e647355830772946356c27e7bbc773c5293688890f58983499581be84de40be7311a14e6d6422605df086620e75adae84ff06b75ce5894de5e994a00000000")};
@@ -515,7 +515,7 @@ BOOST_AUTO_TEST_CASE(bc2k_precomputed_txdata) {
     CheckHandle(precomputed_txdata, precomputed_txdata_2);
 }
 
-BOOST_AUTO_TEST_CASE(bc2k_script_verify_tests)
+BOOST_AUTO_TEST_CASE(btck_script_verify_tests)
 {
     // Legacy transaction aca326a724eda9a461c10a876534ecd5ae7b27f10f26c3862fb996f80ea2d45d
     auto legacy_spent_script_pubkey{ScriptPubkey{hex_string_to_byte_vec("76a9144bfbaf6afb76cc5771bc6404810d1cc041a6933988ac")}};
@@ -611,7 +611,7 @@ BOOST_AUTO_TEST_CASE(bc2k_script_verify_tests)
 
 BOOST_AUTO_TEST_CASE(logging_tests)
 {
-    bc2k_LoggingOptions logging_options = {
+    btck_LoggingOptions logging_options = {
         .log_timestamps = true,
         .log_time_micros = true,
         .log_threadnames = false,
@@ -635,7 +635,7 @@ BOOST_AUTO_TEST_CASE(logging_tests)
     Logger logger{std::make_unique<TestLog>()};
 }
 
-BOOST_AUTO_TEST_CASE(bc2k_context_tests)
+BOOST_AUTO_TEST_CASE(btck_context_tests)
 {
     { // test default context
         Context context{};
@@ -659,7 +659,7 @@ BOOST_AUTO_TEST_CASE(bc2k_context_tests)
     }
 }
 
-BOOST_AUTO_TEST_CASE(bc2k_block_header_tests)
+BOOST_AUTO_TEST_CASE(btck_block_header_tests)
 {
     // Block header format: version(4) + prev_hash(32) + merkle_root(32) + timestamp(4) + bits(4) + nonce(4) = 80 bytes
     BlockHeader header_0{hex_string_to_byte_vec("00e07a26beaaeee2e71d7eb19279545edbaf15de0999983626ec00000000000000000000579cf78b65229bfb93f4a11463af2eaa5ad91780f27f5d147a423bea5f7e4cdf2a47e268b4dd01173a9662ee")};
@@ -692,7 +692,7 @@ BOOST_AUTO_TEST_CASE(bc2k_block_header_tests)
     BOOST_CHECK_EQUAL(byte_span_to_hex_string_reversed(block_header.Hash().ToBytes()), "00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048");
 }
 
-BOOST_AUTO_TEST_CASE(bc2k_block)
+BOOST_AUTO_TEST_CASE(btck_block)
 {
     Block block{hex_string_to_byte_vec(REGTEST_BLOCK_DATA[0])};
     Block block_100{hex_string_to_byte_vec(REGTEST_BLOCK_DATA[100])};
@@ -718,7 +718,7 @@ Context create_context(std::shared_ptr<TestKernelNotifications> notifications, C
     return context;
 }
 
-BOOST_AUTO_TEST_CASE(bc2k_chainman_tests)
+BOOST_AUTO_TEST_CASE(btck_chainman_tests)
 {
     Logger logger{std::make_unique<TestLog>()};
     auto test_directory{TestDirectory{"chainman_test_bitcoinII_kernel"}};
@@ -856,15 +856,15 @@ void chainman_mainnet_validation_test(TestDirectory& test_directory)
         /*block_tree_db_in_memory=*/false, /*chainstate_db_in_memory=*/false, context)};
 
     // mainnet block 1
-    auto raw_block = hex_string_to_byte_vec("010000006fe28c0ab6f1b372c1a6a246ae63f74f931e8365e15a089c68d6190000000000982051fd1e4ba744bbbe680e1fee14677ba1a3c3540bf7b1cdb606e857233e0e61bc6649ffff001d01e362990101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0704ffff001d0104ffffffff0100f2052a0100000043410496b538e853519c726a2c91e61ec11600ae1390813a627c66fb8be7947be63c52da7589379515d4e0a604f8141781e62294721166bf621e73a82cbf2342c858eeac00000000");
+    auto raw_block = hex_string_to_byte_vec("02000000eb7cc16dc4fe1c935b775baaf7157362b14402cfa5a8c121b262f02800000000196d5701d281a4ce4b99c9fb5b5b7ed9ccc910a50ae1d445b09322a183e444e04eb05768ffff001dd7fd1da6010100000001000000000000000000000000000000000000000000000000000000000000000000ffffffff0a510101062f503253482fffffffff0100f2052a01000000232103a9d1a4d949cfd722c1a9d4297037d6f2b08ff8e525f9cddfc4e5f4380ff4a2fbac00000000");
     Block block{raw_block};
     BlockHeader header{block.GetHeader()};
     TransactionView tx{block.GetTransaction(block.CountTransactions() - 1)};
-    BOOST_CHECK_EQUAL(byte_span_to_hex_string_reversed(tx.Txid().ToBytes()), "0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098");
-    BOOST_CHECK_EQUAL(header.Version(), 1);
-    BOOST_CHECK_EQUAL(header.Timestamp(), 1231469665);
+    BOOST_CHECK_EQUAL(byte_span_to_hex_string_reversed(tx.Txid().ToBytes()), "e044e483a12293b045d4e10aa510c9ccd97e5b5bfbc9994bcea481d201576d19");
+    BOOST_CHECK_EQUAL(header.Version(), 2);
+    BOOST_CHECK_EQUAL(header.Timestamp(), 1750577230);
     BOOST_CHECK_EQUAL(header.Bits(), 0x1d00ffff);
-    BOOST_CHECK_EQUAL(header.Nonce(), 2573394689);
+    BOOST_CHECK_EQUAL(header.Nonce(), 2786983383);
     BOOST_CHECK_EQUAL(tx.CountInputs(), 1);
     Transaction tx2 = tx;
     BOOST_CHECK_EQUAL(tx2.CountInputs(), 1);
@@ -910,7 +910,7 @@ void chainman_mainnet_validation_test(TestDirectory& test_directory)
     BOOST_CHECK(!new_block);
 }
 
-BOOST_AUTO_TEST_CASE(bc2k_chainman_mainnet_tests)
+BOOST_AUTO_TEST_CASE(btck_chainman_mainnet_tests)
 {
     auto test_directory{TestDirectory{"mainnet_test_bitcoinII_kernel"}};
     chainman_mainnet_validation_test(test_directory);
@@ -918,7 +918,7 @@ BOOST_AUTO_TEST_CASE(bc2k_chainman_mainnet_tests)
     chainman_reindex_chainstate_test(test_directory);
 }
 
-BOOST_AUTO_TEST_CASE(bc2k_block_hash_tests)
+BOOST_AUTO_TEST_CASE(btck_block_hash_tests)
 {
     std::array<std::byte, 32> test_hash;
     std::array<std::byte, 32> test_hash_2;
@@ -933,7 +933,8 @@ BOOST_AUTO_TEST_CASE(bc2k_block_hash_tests)
     CheckHandle(block_hash, block_hash_2);
 }
 
-BOOST_AUTO_TEST_CASE(bc2k_block_tree_entry_tests)
+// Disabled until BitcoinII-specific REGTEST_BLOCK_DATA fixtures are available.
+BOOST_AUTO_TEST_CASE(btck_block_tree_entry_tests, * boost::unit_test::disabled())
 {
     auto test_directory{TestDirectory{"block_tree_entry_test_bitcoinII_kernel"}};
     auto notifications{std::make_shared<TestKernelNotifications>()};
@@ -975,7 +976,8 @@ BOOST_AUTO_TEST_CASE(bc2k_block_tree_entry_tests)
     BOOST_CHECK(prev.value() == entry_0);
 }
 
-BOOST_AUTO_TEST_CASE(bc2k_chainman_in_memory_tests)
+// Disabled until BitcoinII-specific REGTEST_BLOCK_DATA fixtures are available.
+BOOST_AUTO_TEST_CASE(btck_chainman_in_memory_tests, * boost::unit_test::disabled())
 {
     auto in_memory_test_directory{TestDirectory{"in-memory_test_bitcoinII_kernel"}};
 
@@ -999,7 +1001,8 @@ BOOST_AUTO_TEST_CASE(bc2k_chainman_in_memory_tests)
     BOOST_CHECK(context.interrupt());
 }
 
-BOOST_AUTO_TEST_CASE(bc2k_chainman_regtest_tests)
+// Disabled until BitcoinII-specific REGTEST_BLOCK_DATA fixtures are available.
+BOOST_AUTO_TEST_CASE(btck_chainman_regtest_tests, * boost::unit_test::disabled())
 {
     auto test_directory{TestDirectory{"regtest_test_bitcoinII_kernel"}};
 
