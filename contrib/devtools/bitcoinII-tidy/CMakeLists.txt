@@ -51,10 +51,10 @@ else()
 endif()
 
 if(CMAKE_VERSION VERSION_LESS 3.27)
-    set(CLANG_TIDY_COMMAND "${CLANG_TIDY_EXE}" "--load=${CMAKE_BINARY_DIR}/${CMAKE_SHARED_MODULE_PREFIX}bitcoinII-tidy${CMAKE_SHARED_MODULE_SUFFIX}" "-checks=-*,bitcoinII-*")
+    set(CLANG_TIDY_COMMAND "${CLANG_TIDY_EXE}" "--load=${CMAKE_BINARY_DIR}/${CMAKE_SHARED_MODULE_PREFIX}bitcoinII-tidy${CMAKE_SHARED_MODULE_SUFFIX}" "-checks=-*,bitcoin-*")
 else()
     # CLANG_TIDY_COMMAND supports generator expressions as of 3.27
-    set(CLANG_TIDY_COMMAND "${CLANG_TIDY_EXE}" "--load=$<TARGET_FILE:bitcoinII-tidy>" "-checks=-*,bitcoinII-*")
+    set(CLANG_TIDY_COMMAND "${CLANG_TIDY_EXE}" "--load=$<TARGET_FILE:bitcoinII-tidy>" "-checks=-*,bitcoin-*")
 endif()
 
 # Create a dummy library that runs clang-tidy tests as a side-effect of building
