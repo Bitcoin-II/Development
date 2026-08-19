@@ -11,7 +11,7 @@ class BitcoinIIModule final : public clang::tidy::ClangTidyModule
 public:
     void addCheckFactories(clang::tidy::ClangTidyCheckFactories& CheckFactories) override
     {
-        CheckFactories.registerCheck<bitcoinII::NonTrivialThreadLocal>("bitcoinII-nontrivial-threadlocal");
+        CheckFactories.registerCheck<bitcoinII::NonTrivialThreadLocal>("bitcoin-nontrivial-threadlocal");
     }
 };
 

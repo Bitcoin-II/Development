@@ -184,8 +184,7 @@ BOOST_AUTO_TEST_CASE(taproot_keypath_allowed)
     };
 
     CScriptWitness witness;
-    witness.stack.push_back(
-        std::vector<unsigned char>(64, 0x01));
+    witness.stack.emplace_back(64, 0x01);
 
     BOOST_CHECK(
         Consensus::CheckBitcoinIIWitnessRules(
@@ -203,8 +202,7 @@ BOOST_AUTO_TEST_CASE(taproot_annex_forbidden)
     };
 
     CScriptWitness witness;
-    witness.stack.push_back(
-        std::vector<unsigned char>(64, 0x01));
+    witness.stack.emplace_back(64, 0x01);
 
     std::vector<unsigned char> annex{ANNEX_TAG};
     annex.push_back(0x01);
@@ -231,10 +229,7 @@ BOOST_AUTO_TEST_CASE(tapscript_size_boundary)
 
     {
         CScriptWitness witness;
-        witness.stack.push_back(
-            std::vector<unsigned char>(
-                MAX_BITCOINII_TAPSCRIPT_BYTES,
-                OP_NOP));
+        witness.stack.emplace_back(MAX_BITCOINII_TAPSCRIPT_BYTES, OP_NOP);
         witness.stack.push_back(control_block);
 
         BOOST_CHECK(
@@ -246,10 +241,7 @@ BOOST_AUTO_TEST_CASE(tapscript_size_boundary)
 
     {
         CScriptWitness witness;
-        witness.stack.push_back(
-            std::vector<unsigned char>(
-                MAX_BITCOINII_TAPSCRIPT_BYTES + 1,
-                OP_NOP));
+        witness.stack.emplace_back(MAX_BITCOINII_TAPSCRIPT_BYTES + 1, OP_NOP);
         witness.stack.push_back(control_block);
 
         BOOST_CHECK(
@@ -281,8 +273,7 @@ BOOST_AUTO_TEST_CASE(taproot_ordinal_envelope_forbidden)
     witness.stack.emplace_back(
         tapscript.begin(),
         tapscript.end());
-    witness.stack.push_back(
-        std::vector<unsigned char>(33, 0xc0));
+    witness.stack.emplace_back(33, 0xc0);
 
     BOOST_CHECK(
         Consensus::CheckBitcoinIIWitnessRules(
