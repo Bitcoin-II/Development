@@ -293,7 +293,9 @@ void check_computeblockversion(VersionBitsCache& versionbitscache, const Consens
 
     BOOST_REQUIRE(nStartTime < nTimeout);
     BOOST_REQUIRE(nStartTime >= 0);
-    BOOST_REQUIRE(nTimeout <= std::numeric_limits<uint32_t>::max() || nTimeout == Consensus::BIP9Deployment::NO_TIMEOUT);
+    // BitcoinII permits deployment timeouts beyond the uint32_t block timestamp
+    // range. Such a timeout cannot be reached by a block timestamp, so the
+    // FAILED-state timeout simulation below is skipped for those deployments.
     BOOST_REQUIRE(0 <= bit && bit < 32);
     // Make sure that no deployment tries to set an invalid bit.
     BOOST_REQUIRE(((1 << bit) & VERSIONBITS_TOP_MASK) == 0);
@@ -371,7 +373,8 @@ void check_computeblockversion(VersionBitsCache& versionbitscache, const Consens
         nHeight += 1;
     }
 
-    if (nTimeout != Consensus::BIP9Deployment::NO_TIMEOUT) {
+    if (nTimeout != Consensus::BIP9Deployment::NO_TIMEOUT &&
+        nTimeout <= std::numeric_limits<uint32_t>::max()) {
         // can reach any nTimeout other than NO_TIMEOUT due to earlier BOOST_REQUIRE
 
         nTime = nTimeout;
