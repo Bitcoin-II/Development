@@ -18,7 +18,7 @@ from test_framework.blocktools import (
 )
 from test_framework.script import (
     CScript,
-    OP_RETURN,
+    OP_0,
 )
 from test_framework.test_framework import BitcoinIITestFramework
 from test_framework.util import (
@@ -34,31 +34,36 @@ from test_framework.util import (
 TIMESTAMP_WINDOW = 2 * 60 * 60
 
 def mine_large_blocks(node, n):
-    # Make a large scriptPubKey for the coinbase transaction. The upstream
-    # fixture uses 950k repeated OP_NOP bytes, which compress extremely well in
-    # BitcoinII and therefore do not exercise physical disk pruning.
-    # Use deterministic incompressible bytes while preserving the same script
-    # size. This remains non-standard in a non-coinbase transaction but is
-    # consensus valid.
+    # Create physically large, incompressible blocks without violating
+    # BitcoinII's OP_RETURN consensus limits. A scriptPubKey larger than
+    # MAX_SCRIPT_SIZE is provably unspendable and is therefore not added
+    # to the UTXO set.
 
     # Set the nTime if this is the first time this function has been called.
-    # A static variable ensures that time is monotonicly increasing and is therefore
-    # different for each block created => blockhash is unique.
+    # A static variable ensures that time is monotonically increasing and is
+    # therefore different for each block created => blockhash is unique.
     if "nTime" not in mine_large_blocks.__dict__:
         mine_large_blocks.nTime = 0
 
-    # Get the block parameters for the first block
+    # Prefix with OP_0 rather than OP_RETURN so BitcoinII's data-carrier
+    # consensus rules do not apply. The deterministic SHAKE output keeps
+    # the ~950 kB script effectively incompressible for pruning tests.
     big_script = CScript(
-        bytes([OP_RETURN])
+        bytes([OP_0])
         + hashlib.shake_256(b"feature-pruning-large-block").digest(950000)
     )
+
     best_block = node.getblock(node.getbestblockhash())
     height = int(best_block["height"]) + 1
     mine_large_blocks.nTime = max(mine_large_blocks.nTime, int(best_block["time"])) + 1
     previousblockhash = int(best_block["hash"], 16)
 
     for _ in range(n):
-        block = create_block(hashprev=previousblockhash, ntime=mine_large_blocks.nTime, coinbase=create_coinbase(height, script_pubkey=big_script))
+        block = create_block(
+            hashprev=previousblockhash,
+            ntime=mine_large_blocks.nTime,
+            coinbase=create_coinbase(height, script_pubkey=big_script),
+        )
         block.solve()
 
         # Submit to the node
@@ -68,8 +73,10 @@ def mine_large_blocks(node, n):
         height += 1
         mine_large_blocks.nTime += 1
 
+
 def calc_usage(blockdir):
     return sum(os.path.getsize(blockdir + f) for f in os.listdir(blockdir) if os.path.isfile(os.path.join(blockdir, f))) / (1024. * 1024.)
+
 
 class PruneTest(BitcoinIITestFramework):
     def set_test_params(self):
