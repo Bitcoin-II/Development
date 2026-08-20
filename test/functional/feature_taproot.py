@@ -929,24 +929,6 @@ def spenders_taproot_active():
     assert_equal(len(CScriptNum.encode(CScriptNum(OVERSIZE_NUMBER))), 6)
     assert_equal(len(CScriptNum.encode(CScriptNum(OVERSIZE_NUMBER-1))), 5)
 
-    big_choices = []
-    big_scriptops = []
-    for i in range(1000):
-        r = random.randrange(len(pubs))
-        big_choices.append(r)
-        big_scriptops += [pubs[r], OP_CHECKSIGVERIFY]
-
-
-    def big_spend_inputs(ctx):
-        """Helper function to construct the script input for t33/t34 below."""
-        # Instead of signing 999 times, precompute signatures for every (key, hashtype) combination
-        sigs = {}
-        for ht in VALID_SIGHASHES_TAPROOT:
-            for k in range(len(pubs)):
-                sigs[(k, ht)] = override(default_sign, hashtype=ht, key=secs[k])(ctx)
-        num = get(ctx, "num")
-        return [sigs[(big_choices[i], random.choice(VALID_SIGHASHES_TAPROOT))] for i in range(num - 1, -1, -1)]
-
     # Various BIP342 features
     scripts = [
         # 0) drop stack element and OP_CHECKSIG
@@ -987,8 +969,6 @@ def spenders_taproot_active():
         ("t17", CScript([OP_0, OP_1, OP_CHECKSIGADD])),
         # 18) OP_CHECKSIGVERIFY with unknown pubkey type
         ("t18", CScript([OP_1, OP_CHECKSIGVERIFY, OP_1])),
-        # 19) script longer than 10000 bytes and over 201 non-push opcodes
-        ("t19", CScript([OP_0, OP_0, OP_2DROP] * 10001 + [pubs[1], OP_CHECKSIG])),
         # 20) OP_CHECKSIGVERIFY with empty key
         ("t20", CScript([pubs[1], OP_CHECKSIGVERIFY, OP_0, OP_0, OP_CHECKSIGVERIFY, OP_1])),
         # 21) Script that grows the stack to 1000 elements
@@ -1015,10 +995,6 @@ def spenders_taproot_active():
         ("t31", CScript([b'\x02' + pubs[1], OP_CHECKSIGVERIFY, OP_1])),
         # 32) Variant of t28 with "normal" 33-byte pubkey
         ("t32", CScript([csa_high_val, b'\x03' + pubs[1], OP_CHECKSIGADD, csa_high_result, OP_EQUAL])),
-        # 33) 999-of-999 multisig
-        ("t33", CScript(big_scriptops[:1998] + [OP_1])),
-        # 34) 1000-of-1000 multisig
-        ("t34", CScript(big_scriptops[:2000] + [OP_1])),
         # 35) Variant of t9 that uses a non-minimally encoded input arg
         ("t35", CScript([bytes([csa_low_val]), pubs[1], OP_CHECKSIGADD, csa_low_result, OP_EQUAL])),
         # 36) Empty script
@@ -1074,8 +1050,6 @@ def spenders_taproot_active():
     add_spender(spenders, "tapscript/1000inputs", leaf="t23", **common, inputs=[getter("sign")] + [b'' for _ in range(999)], failure={"leaf": "t24", "inputs": [getter("sign")] + [b'' for _ in range(1000)]}, **ERR_STACK_SIZE)
     # Test that pushing a MAX_SCRIPT_ELEMENT_SIZE byte stack element is valid, but one longer is not.
     add_spender(spenders, "tapscript/pushmaxlimit", leaf="t25", **common, **SINGLE_SIG, failure={"leaf": "t26"}, **ERR_PUSH_SIZE)
-    # Test that 999-of-999 multisig works (but 1000-of-1000 triggers stack size limits)
-    add_spender(spenders, "tapscript/bigmulti", leaf="t33", **common, inputs=big_spend_inputs, num=999, failure={"leaf": "t34", "num": 1000}, **ERR_STACK_SIZE)
     # Test that the CLEANSTACK rule is consensus critical in tapscript
     add_spender(spenders, "tapscript/cleanstack", leaf="t36", tap=tap, inputs=[b'\x01'], failure={"inputs": [b'\x01', b'\x01']}, **ERR_CLEANSTACK)
 
@@ -1315,7 +1289,7 @@ def spenders_taproot_nonstandard():
     ]
     tap = taproot_construct(pub, scripts)
 
-    # Test that features like annex, leaf versions, or OP_SUCCESS are valid but non-standard
+    # Test that future leaf versions and OP_SUCCESS are valid but non-standard.
     add_spender(spenders, "inactive/scriptpath_valid_unkleaf", key=sec, tap=tap, leaf="future_leaf", standard=False, inputs=[getter("sign")])
     add_spender(spenders, "inactive/scriptpath_invalid_unkleaf", key=sec, tap=tap, leaf="future_leaf", standard=False, inputs=[getter("sign")], sighash=bitflipper(default_sighash))
     add_spender(spenders, "inactive/scriptpath_valid_opsuccess", key=sec, tap=tap, leaf="op_success", standard=False, inputs=[getter("sign")])

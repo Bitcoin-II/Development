@@ -1016,7 +1016,7 @@ public:
      * @param use_max_sig Whether to assume ECDSA signatures will have a high-r.
      * @return The maximum size of the satisfaction in raw bytes (with no witness meaning).
      */
-    virtual std::optional<int64_t> MaxSat2Size(bool use_max_sig) const { return {}; }
+    virtual std::optional<int64_t> MaxSatSize(bool use_max_sig) const { return {}; }
 
     std::optional<int64_t> MaxSatisfactionWeight(bool) const override { return {}; }
 
@@ -1159,13 +1159,13 @@ public:
         return 1 + (m_xonly ? 32 : m_pubkey_args[0]->GetSize()) + 1;
     }
 
-    std::optional<int64_t> MaxSat2Size(bool use_max_sig) const override {
+    std::optional<int64_t> MaxSatSize(bool use_max_sig) const override {
         const auto ecdsa_sig_size = use_max_sig ? 72 : 71;
         return 1 + (m_xonly ? 65 : ecdsa_sig_size);
     }
 
     std::optional<int64_t> MaxSatisfactionWeight(bool use_max_sig) const override {
-        return *MaxSat2Size(use_max_sig) * WITNESS_SCALE_FACTOR;
+        return *MaxSatSize(use_max_sig) * WITNESS_SCALE_FACTOR;
     }
 
     std::optional<int64_t> MaxSatisfactionElems() const override { return 1; }
@@ -1192,13 +1192,13 @@ public:
 
     std::optional<int64_t> ScriptSize() const override { return 1 + 1 + 1 + 20 + 1 + 1; }
 
-    std::optional<int64_t> MaxSat2Size(bool use_max_sig) const override {
+    std::optional<int64_t> MaxSatSize(bool use_max_sig) const override {
         const auto sig_size = use_max_sig ? 72 : 71;
         return 1 + sig_size + 1 + m_pubkey_args[0]->GetSize();
     }
 
     std::optional<int64_t> MaxSatisfactionWeight(bool use_max_sig) const override {
-        return *MaxSat2Size(use_max_sig) * WITNESS_SCALE_FACTOR;
+        return *MaxSatSize(use_max_sig) * WITNESS_SCALE_FACTOR;
     }
 
     std::optional<int64_t> MaxSatisfactionElems() const override { return 2; }
@@ -1225,13 +1225,13 @@ public:
 
     std::optional<int64_t> ScriptSize() const override { return 1 + 1 + 20; }
 
-    std::optional<int64_t> MaxSat2Size(bool use_max_sig) const override {
+    std::optional<int64_t> MaxSatSize(bool use_max_sig) const override {
         const auto sig_size = use_max_sig ? 72 : 71;
         return (1 + sig_size + 1 + 33);
     }
 
     std::optional<int64_t> MaxSatisfactionWeight(bool use_max_sig) const override {
-        return MaxSat2Size(use_max_sig);
+        return MaxSatSize(use_max_sig);
     }
 
     std::optional<int64_t> MaxSatisfactionElems() const override { return 2; }
@@ -1295,13 +1295,13 @@ public:
         return 1 + BuildScript(n_keys).size() + BuildScript(m_threshold).size() + pubkeys_size;
     }
 
-    std::optional<int64_t> MaxSat2Size(bool use_max_sig) const override {
+    std::optional<int64_t> MaxSatSize(bool use_max_sig) const override {
         const auto sig_size = use_max_sig ? 72 : 71;
         return (1 + (1 + sig_size) * m_threshold);
     }
 
     std::optional<int64_t> MaxSatisfactionWeight(bool use_max_sig) const override {
-        return *MaxSat2Size(use_max_sig) * WITNESS_SCALE_FACTOR;
+        return *MaxSatSize(use_max_sig) * WITNESS_SCALE_FACTOR;
     }
 
     std::optional<int64_t> MaxSatisfactionElems() const override { return 1 + m_threshold; }
@@ -1344,7 +1344,7 @@ public:
         return (1 + 32 + 1) * n_keys + BuildScript(m_threshold).size() + 1;
     }
 
-    std::optional<int64_t> MaxSat2Size(bool use_max_sig) const override {
+    std::optional<int64_t> MaxSatSize(bool use_max_sig) const override {
         return (1 + 65) * m_threshold + (m_pubkey_args.size() - m_threshold);
     }
 
@@ -1388,13 +1388,13 @@ public:
     std::optional<int64_t> ScriptSize() const override { return 1 + 1 + 20 + 1; }
 
     std::optional<int64_t> MaxSatisfactionWeight(bool use_max_sig) const override {
-        if (const auto sat2_size = m_subdescriptor_args[0]->MaxSat2Size(use_max_sig)) {
+        if (const auto sat_size = m_subdescriptor_args[0]->MaxSatSize(use_max_sig)) {
             if (const auto subscript_size = m_subdescriptor_args[0]->ScriptSize()) {
                 // The subscript is never witness data.
                 const auto subscript_weight = (1 + *subscript_size) * WITNESS_SCALE_FACTOR;
                 // The weight depends on whether the inner descriptor is satisfied using the witness stack.
-                if (IsSegwit()) return subscript_weight + *sat2_size;
-                return subscript_weight + *sat2_size * WITNESS_SCALE_FACTOR;
+                if (IsSegwit()) return subscript_weight + *sat_size;
+                return subscript_weight + *sat_size * WITNESS_SCALE_FACTOR;
             }
         }
         return {};
@@ -1428,17 +1428,17 @@ public:
 
     std::optional<int64_t> ScriptSize() const override { return 1 + 1 + 32; }
 
-    std::optional<int64_t> MaxSat2Size(bool use_max_sig) const override {
-        if (const auto sat2_size = m_subdescriptor_args[0]->MaxSat2Size(use_max_sig)) {
+    std::optional<int64_t> MaxSatSize(bool use_max_sig) const override {
+        if (const auto sat_size = m_subdescriptor_args[0]->MaxSatSize(use_max_sig)) {
             if (const auto subscript_size = m_subdescriptor_args[0]->ScriptSize()) {
-                return GetSizeOfCompactSize(*subscript_size) + *subscript_size + *sat2_size;
+                return GetSizeOfCompactSize(*subscript_size) + *subscript_size + *sat_size;
             }
         }
         return {};
     }
 
     std::optional<int64_t> MaxSatisfactionWeight(bool use_max_sig) const override {
-        return MaxSat2Size(use_max_sig);
+        return MaxSatSize(use_max_sig);
     }
 
     std::optional<int64_t> MaxSatisfactionElems() const override {
@@ -1681,7 +1681,7 @@ public:
 
     std::optional<int64_t> ScriptSize() const override { return m_node.ScriptSize(); }
 
-    std::optional<int64_t> MaxSat2Size(bool) const override
+    std::optional<int64_t> MaxSatSize(bool) const override
     {
         // For Miniscript we always assume high-R ECDSA signatures.
         return m_node.GetWitnessSize();
