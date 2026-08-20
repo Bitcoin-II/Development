@@ -689,14 +689,18 @@ def check_node_connections(*, node, num_in, num_out):
 #############################
 
 
-# Create large OP_RETURN txouts that can be appended to a transaction
-# to make it large (helper for constructing large transactions). The
-# total serialized size of the txouts is about 66k vbytes.
+# Create standard txouts that can be appended to a transaction to make
+# it large. BitcoinII limits OP_RETURN payloads, so use ordinary P2WSH
+# outputs instead. The total serialized size is about 66k vbytes.
 def gen_return_txouts():
     from .messages import CTxOut
-    from .script import CScript, OP_RETURN
-    txouts = [CTxOut(nValue=0, scriptPubKey=CScript([OP_RETURN, b'\x01'*67437]))]
-    assert_equal(sum([len(txout.serialize()) for txout in txouts]), 67456)
+    from .script import CScript, OP_0
+    padding_spk = CScript([OP_0, b'\x01' * 32])
+    txouts = [
+        CTxOut(nValue=10_000, scriptPubKey=padding_spk)
+        for _ in range(1568)
+    ]
+    assert_equal(sum(len(txout.serialize()) for txout in txouts), 67424)
     return txouts
 
 
@@ -710,6 +714,9 @@ def create_lots_of_big_transactions(mini_wallet, node, fee, tx_batch_size, txout
             utxo_to_spend=None if use_internal_utxos else utxos.pop(),
             fee=fee,
         )["tx"]
+        # Preserve the requested transaction fee after adding the
+        # positive-value padding outputs.
+        tx.vout[0].nValue -= sum(txout.nValue for txout in txouts)
         tx.vout.extend(txouts)
         res = node.testmempoolaccept([tx.serialize().hex()])[0]
         assert_equal(res['fees']['base'], fee)

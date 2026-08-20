@@ -24,7 +24,7 @@ def run(cmd, **kwargs):
 
 
 def print_version():
-    bitcoinIId = Path.cwd() / "bin" / "bitcoinIId.exe"
+    bitcoinIId = Path.cwd() / "bin" / "bitcoinII-d.exe"
     run([str(bitcoinIId), "-version"])
 
 
@@ -35,7 +35,7 @@ def check_manifests():
     cmd_bitcoinIId_manifest = [
         "mt.exe",
         "-nologo",
-        f"-inputresource:{release_dir / 'bitcoinIId.exe'}",
+        f"-inputresource:{release_dir / 'bitcoinII-d.exe'}",
         f"-out:{manifest_path}",
     ]
     run(cmd_bitcoinIId_manifest)
