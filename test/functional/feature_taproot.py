@@ -504,7 +504,7 @@ def spend(tx, idx, utxos, **kwargs):
 # - Whether this spend cannot fail
 # - Whether this test demands being placed in a txin with no corresponding txout (for testing SIGHASH_SINGLE behavior)
 
-Spender = namedtuple("Spender", "script,comment,is_standard,sat2_function,err_msg,sigops_weight,no_fail,need_vin_vout_mismatch")
+Spender = namedtuple("Spender", "script,comment,is_standard,sat_function,err_msg,sigops_weight,no_fail,need_vin_vout_mismatch")
 
 
 def make_spender(comment, *, tap=None, witv0=False, script=None, pkh=None, p2sh=False, spk_mutate_pre_p2sh=None, failure=None, standard=True, err_msg=None, sigops_weight=0, need_vin_vout_mismatch=False, **kwargs):
@@ -576,14 +576,14 @@ def make_spender(comment, *, tap=None, witv0=False, script=None, pkh=None, p2sh=
 
     conf = {**conf, **kwargs}
 
-    def sat2_fn(tx, idx, utxos, valid):
+    def sat_fn(tx, idx, utxos, valid):
         if valid:
             return spend(tx, idx, utxos, **conf)
         else:
             assert failure is not None
             return spend(tx, idx, utxos, **{**conf, **failure})
 
-    return Spender(script=spk, comment=comment, is_standard=standard, sat2_function=sat2_fn, err_msg=err_msg, sigops_weight=sigops_weight, no_fail=failure is None, need_vin_vout_mismatch=need_vin_vout_mismatch)
+    return Spender(script=spk, comment=comment, is_standard=standard, sat_function=sat_fn, err_msg=err_msg, sigops_weight=sigops_weight, no_fail=failure is None, need_vin_vout_mismatch=need_vin_vout_mismatch)
 
 def add_spender(spenders, *args, **kwargs):
     """Make a spender using make_spender, and add it to spenders."""
@@ -738,10 +738,10 @@ def spenders_taproot_active():
 
     # == Tests for signature hashing ==
 
-    # Run all tests once with no annex, and once with a valid random annex.
-    for annex in [None, lambda _: bytes([ANNEX_TAG]) + random.randbytes(random.randrange(0, 250))]:
-        # Non-empty annex is non-standard
-        no_annex = annex is None
+    # BitcoinII rejects Taproot annexes at consensus, so these generic
+    # Taproot validity tests run without annexes.
+    for annex in [None]:
+        no_annex = True
 
         # Sighash mutation tests (test all sighash combinations)
         for hashtype in VALID_SIGHASHES_TAPROOT:
@@ -784,7 +784,6 @@ def spenders_taproot_active():
         add_spender(spenders, "sighash/codesep_pk_wrongpos2", tap=tap, leaf="codesep_pk", key=secs[1], codeseppos=0, **common, **SINGLE_SIG, failure={"codeseppos": 0xfffffffe}, **ERR_SCHNORR_SIG)
 
     # Reusing the scripts above, test that various features affect the sighash.
-    add_spender(spenders, "sighash/annex", tap=tap, leaf="pk_codesep", key=secs[1], hashtype=hashtype, standard=False, **SINGLE_SIG, annex=bytes([ANNEX_TAG]), failure={"sighash": override(default_sighash, annex=None)}, **ERR_SCHNORR_SIG)
     add_spender(spenders, "sighash/script", tap=tap, leaf="pk_codesep", key=secs[1], **common, **SINGLE_SIG, failure={"sighash": override(default_sighash, script_taproot=tap.leaves["codesep_pk"].script)}, **ERR_SCHNORR_SIG)
     add_spender(spenders, "sighash/leafver", tap=tap, leaf="pk_codesep", key=secs[1], **common, **SINGLE_SIG, failure={"sighash": override(default_sighash, leafversion=random.choice([x & 0xFE for x in range(0x100) if x & 0xFE != LEAF_VERSION_TAPSCRIPT]))}, **ERR_SCHNORR_SIG)
     add_spender(spenders, "sighash/scriptpath", tap=tap, leaf="pk_codesep", key=secs[1], **common, **SINGLE_SIG, failure={"sighash": override(default_sighash, leaf=None)}, **ERR_SCHNORR_SIG)
@@ -1101,7 +1100,7 @@ def spenders_taproot_active():
         # n OP_CHECKSIGADDs and 1 OP_CHECKSIG, but also an OP_CHECKSIGADD with an empty signature.
         lambda n, pk: (CScript([OP_DROP, OP_0, OP_10, pk, OP_CHECKSIGADD, OP_10, OP_EQUALVERIFY, pk] + [OP_2DUP, OP_16, OP_SWAP, OP_CHECKSIGADD, b'\x11', OP_EQUALVERIFY] * n + [OP_CHECKSIG]), n + 1),
     ]
-    for annex in [None, bytes([ANNEX_TAG]) + random.randbytes(random.randrange(1000))]:
+    for annex in [None]:
         for hashtype in [SIGHASH_DEFAULT, SIGHASH_ALL]:
             for pubkey in [pubs[1], random.randbytes(random.choice([x for x in range(2, 81) if x != 32]))]:
                 for fn_num, fn in enumerate(SIGOPS_RATIO_SCRIPTS):
@@ -1606,7 +1605,7 @@ class TaprootTest(BitcoinIITestFramework):
             # Precompute one satisfying and one failing scriptSig/witness for each input.
             input_data = []
             for i in range(len(input_utxos)):
-                fn = input_utxos[i].spender.sat2_function
+                fn = input_utxos[i].spender.sat_function
                 fail = None
                 success = fn(tx, i, [utxo.output for utxo in input_utxos], True)
                 if not input_utxos[i].spender.no_fail:
