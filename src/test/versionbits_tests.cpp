@@ -300,8 +300,8 @@ void check_computeblockversion(VersionBitsCache& versionbitscache, const Consens
     // Make sure that no deployment tries to set an invalid bit.
     BOOST_REQUIRE(((1 << bit) & VERSIONBITS_TOP_MASK) == 0);
     BOOST_REQUIRE(min_activation_height >= 0);
-    // Check min_activation_height is on a retarget boundary
-    BOOST_REQUIRE_EQUAL(min_activation_height % period, 0U);
+    // BitcoinII permits non-boundary minimum activation heights. Versionbits
+    // state transitions still occur only on deployment period boundaries.
 
     // In the first chain, test that the bit is set by CBV until it has failed.
     // In the second chain, test the bit is set by CBV while STARTED and
