@@ -347,7 +347,8 @@ def get_binary_paths(config):
             "bin",
             binary + config["environment"]["EXEEXT"],
         )
-        setattr(paths, env_variable_name.lower(), os.getenv(env_variable_name, default=default_filename))
+        attribute_name = env_variable_name.lower().replace("bitcoinii", "bitcoinII", 1)
+        setattr(paths, attribute_name, os.getenv(env_variable_name, default=default_filename))
     # BITCOINII_CMD environment variable can be specified to invoke bitcoinII
     # wrapper binary instead of other executables.
     paths.bitcoinII_cmd = shlex.split(os.getenv("BITCOINII_CMD", "")) or None
