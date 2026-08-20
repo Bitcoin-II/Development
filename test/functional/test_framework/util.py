@@ -631,13 +631,6 @@ def get_temp_default_datadir(temp_dir: pathlib.Path) -> tuple[dict, pathlib.Path
 def append_config(datadir, options):
     config_paths = [os.path.join(datadir, "bitcoinII.conf")]
 
-    # Previous-release compatibility nodes use upstream BitcoinII Core and
-    # therefore require bitcoinII.conf. If TestNode created that compatibility
-    # config, keep subsequent config additions synchronized with it.
-    legacy_config = os.path.join(datadir, "bitcoinII.conf")
-    if os.path.isfile(legacy_config):
-        config_paths.append(legacy_config)
-
     for config_path in config_paths:
         with open(config_path, 'a') as f:
             for option in options:

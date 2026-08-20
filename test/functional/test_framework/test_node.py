@@ -137,17 +137,6 @@ class TestNode():
             append_config(self.datadir_path, extra_conf)
             # Remember if there is bind=... in the config file.
             self.has_explicit_bind = any(e.startswith("bind=") for e in extra_conf)
-        # Previous-release compatibility nodes run upstream BitcoinII Core,
-        # which expects bitcoinII.conf rather than bitcoinII.conf.
-        #
-        # initialize_datadir() has already created the BitcoinII config.
-        # Copy that complete test configuration for the legacy binary and
-        # point this TestNode at the legacy filename.
-        if version is not None:
-            legacy_conf = self.datadir_path / "bitcoinII.conf"
-            shutil.copyfile(self.bitcoinIIconf, legacy_conf)
-            self.bitcoinIIconf = legacy_conf
-
         # Most callers will just need to add extra args to the standard list below.
         # For those callers that need more flexibility, they can just set the args property directly.
         # Note that common args are set in the config file (see initialize_datadir)
