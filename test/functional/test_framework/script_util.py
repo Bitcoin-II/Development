@@ -143,7 +143,7 @@ def bulk_vout(tx, target_vsize):
     # compensate for the increase of the compact-size encoded script length
     # (note that the length encoding of the unpadded output script needs one byte)
     dummy_vbytes -= len(ser_compact_size(dummy_vbytes)) - 1
-    tx.vout[-1].scriptPubKey = CScript([OP_RETURN] + [OP_1] * dummy_vbytes)
+    tx.vout[-1].scriptPubKey = script_to_p2wsh_script(CScript([OP_1] * dummy_vbytes))
     assert_equal(tx.get_vsize(), target_vsize)
 
 def output_key_to_p2tr_script(key):
