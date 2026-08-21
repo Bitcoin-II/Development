@@ -1138,6 +1138,7 @@ class SegWitTest(BitcoinIITestFramework):
         tx2.vin[0].prevout.hash = tx.txid_int
         tx2.wit.vtxinwit[0].scriptWitness.stack = [b'a'] * 43 + [witness_script]
         block.vtx = [block.vtx[0]]
+        block.vtx[0].vout.pop()
         self.update_witness_block_with_transactions(block, [tx, tx2])
         test_witness_block(self.nodes[0], self.test_node, block, accepted=True)
 
