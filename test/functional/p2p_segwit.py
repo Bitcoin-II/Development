@@ -1583,6 +1583,7 @@ class SegWitTest(BitcoinIITestFramework):
                 # Too-small input value
                 sign_p2pk_witness_input(witness_script, tx, 0, hashtype, prev_utxo.nValue - 1, key)
                 block.vtx.pop()  # remove last tx
+                block.vtx[0].vout.pop()
                 self.update_witness_block_with_transactions(block, [tx])
                 test_witness_block(self.nodes[0], self.test_node, block, accepted=False,
                                    reason='block-script-verify-flag-failed (Script evaluated without error '
@@ -1591,6 +1592,7 @@ class SegWitTest(BitcoinIITestFramework):
                 # Now try correct value
                 sign_p2pk_witness_input(witness_script, tx, 0, hashtype, prev_utxo.nValue, key)
                 block.vtx.pop()
+                block.vtx[0].vout.pop()
                 self.update_witness_block_with_transactions(block, [tx])
                 test_witness_block(self.nodes[0], self.test_node, block, accepted=True)
 
@@ -1693,6 +1695,7 @@ class SegWitTest(BitcoinIITestFramework):
 
         # Move the signature to the witness.
         block.vtx.pop()
+        block.vtx[0].vout.pop()
         tx2.wit.vtxinwit.append(CTxInWitness())
         tx2.wit.vtxinwit[0].scriptWitness.stack = [signature, pubkey]
         tx2.vin[0].scriptSig = b""
