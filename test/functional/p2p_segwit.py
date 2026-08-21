@@ -1205,6 +1205,7 @@ class SegWitTest(BitcoinIITestFramework):
         tx2.wit.vtxinwit.pop()
 
         block.vtx = [block.vtx[0]]
+        block.vtx[0].vout.pop()
         self.update_witness_block_with_transactions(block, [tx2])
         # This block doesn't result in a specific reject reason, but an iostream exception:
         with self.nodes[0].assert_debug_log(["Exception 'DataStream::read(): end of data"]):
@@ -1216,6 +1217,7 @@ class SegWitTest(BitcoinIITestFramework):
         tx2.wit.vtxinwit[5].scriptWitness.stack = [witness_script]
 
         block.vtx = [block.vtx[0]]
+        block.vtx[0].vout.pop()
         self.update_witness_block_with_transactions(block, [tx2])
         test_witness_block(self.nodes[0], self.test_node, block, accepted=False,
                            reason='block-script-verify-flag-failed (Operation not valid with the current stack size)')
@@ -1223,6 +1225,7 @@ class SegWitTest(BitcoinIITestFramework):
         # Fix the broken witness and the block should be accepted.
         tx2.wit.vtxinwit[5].scriptWitness.stack = [b'a', witness_script]
         block.vtx = [block.vtx[0]]
+        block.vtx[0].vout.pop()
         self.update_witness_block_with_transactions(block, [tx2])
         test_witness_block(self.nodes[0], self.test_node, block, accepted=True)
 
