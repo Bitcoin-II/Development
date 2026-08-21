@@ -13,7 +13,6 @@ from test_framework.messages import (
     CTxIn,
     CTxInWitness,
     CTxOut,
-    ser_compact_size,
     sha256,
 )
 from test_framework.script import (
