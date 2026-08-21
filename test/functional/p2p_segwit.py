@@ -773,24 +773,25 @@ class SegWitTest(BitcoinIITestFramework):
 
         block_3 = self.build_next_block()
         self.update_witness_block_with_transactions(block_3, [tx, tx2], nonce=1)
-        # Add an extra OP_RETURN output that matches the witness commitment template,
-        # even though it has extra data after the incorrect commitment.
-        # This block should fail.
-        block_3.vtx[0].vout.append(CTxOut(0, CScript([OP_RETURN, WITNESS_COMMITMENT_HEADER + ser_uint256(2), 10])))
+        # BitcoinII permits only one OP_RETURN output per transaction.
+        # Replace the existing witness commitment with an invalid one.
+        block_3.vtx[0].vout[-1] = CTxOut(
+            0,
+            CScript([OP_RETURN, WITNESS_COMMITMENT_HEADER + ser_uint256(2), 10]),
+        )
         block_3.hashMerkleRoot = block_3.calc_merkle_root()
         block_3.solve()
 
         test_witness_block(self.nodes[0], self.test_node, block_3, accepted=False, reason='bad-witness-merkle-match')
 
-        # Add a different commitment with different nonce, but in the
-        # right location, and with some funds burned(!).
-        # This should succeed (nValue shouldn't affect finding the
-        # witness commitment).
+        # Replace the invalid commitment with a valid commitment using a
+        # different nonce. Keep the coinbase to one OP_RETURN output.
+        block_3.vtx[0].vout.pop()
         add_witness_commitment(block_3, nonce=0)
         block_3.vtx[0].vout[0].nValue -= 1
         block_3.vtx[0].vout[-1].nValue += 1
         block_3.hashMerkleRoot = block_3.calc_merkle_root()
-        assert len(block_3.vtx[0].vout) == 4  # 3 OP_returns
+        assert len(block_3.vtx[0].vout) == 2  # monetary output + witness commitment
         block_3.solve()
         test_witness_block(self.nodes[0], self.test_node, block_3, accepted=True)
 
