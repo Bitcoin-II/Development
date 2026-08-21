@@ -138,16 +138,37 @@ def bulk_vout(tx, target_vsize):
     if target_vsize < tx.get_vsize():
         raise RuntimeError(f"target_vsize {target_vsize} is less than transaction virtual size {tx.get_vsize()}")
 
+    # BitcoinII limits OP_RETURN payload size, so use ordinary P2WSH
+    # outputs for bulk padding. Keep the existing small OP_RETURN output
+    # for the final few bytes needed to hit target_vsize exactly.
     padding_spk = CScript([OP_0, b'\x01' * 32])
+    padding_value = 10_000
+    tail_output = tx.vout[-1]
 
-    while tx.get_vsize() < target_vsize:
-        tx.vout.append(CTxOut(nValue=0, scriptPubKey=padding_spk))
+    while True:
+        if tx.vout[0].nValue < padding_value:
+            raise RuntimeError("insufficient output value for transaction padding")
 
-    # Remove excess padding if the final output pushed us over.
-    while tx.get_vsize() > target_vsize and len(tx.vout) > 1:
-        tx.vout.pop()
+        tx.vout[0].nValue -= padding_value
+        tx.vout.append(CTxOut(nValue=padding_value, scriptPubKey=padding_spk))
+
+        if tx.get_vsize() > target_vsize:
+            tx.vout.pop()
+            tx.vout[0].nValue += padding_value
+            break
+
+    # A P2WSH output adds 43 vbytes normally (45 when the CompactSize
+    # output count grows), so the remaining padding always fits within
+    # a small BitcoinII-compatible OP_RETURN.
+    remaining_vbytes = target_vsize - tx.get_vsize()
+    assert 0 <= remaining_vbytes <= 44
+
+    tail_output.scriptPubKey = CScript(
+        [OP_RETURN] + [OP_1] * remaining_vbytes
+    )
 
     assert_equal(tx.get_vsize(), target_vsize)
+
 
 def output_key_to_p2tr_script(key):
     assert len(key) == 32
