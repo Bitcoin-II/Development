@@ -1016,6 +1016,7 @@ class SegWitTest(BitcoinIITestFramework):
         # Try extra signature data.  Ok if we're not spending a witness output.
         block.vtx[1].wit.vtxinwit = []
         block.vtx[1].vin[0].scriptSig = CScript([OP_0])
+        block.vtx[0].vout.pop()
         add_witness_commitment(block)
         block.solve()
 
@@ -1043,6 +1044,7 @@ class SegWitTest(BitcoinIITestFramework):
         tx2.vin[1].scriptSig = CScript([OP_TRUE])
         tx2.wit.vtxinwit[0].scriptWitness.stack.pop(0)
         tx2.wit.vtxinwit[1].scriptWitness.stack = []
+        block.vtx[0].vout.pop()
         add_witness_commitment(block)
         block.solve()
 
@@ -1053,6 +1055,7 @@ class SegWitTest(BitcoinIITestFramework):
         # Now get rid of the extra scriptsig on the witness input, and verify
         # success (even with extra scriptsig data in the non-witness input)
         tx2.vin[0].scriptSig = b""
+        block.vtx[0].vout.pop()
         add_witness_commitment(block)
         block.solve()
 
@@ -1089,6 +1092,7 @@ class SegWitTest(BitcoinIITestFramework):
         # Now reduce the length of the stack element
         tx2.wit.vtxinwit[0].scriptWitness.stack[0] = b'a' * (MAX_SCRIPT_ELEMENT_SIZE)
 
+        block.vtx[0].vout.pop()
         add_witness_commitment(block)
         block.solve()
         test_witness_block(self.nodes[0], self.test_node, block, accepted=True)
