@@ -1241,7 +1241,6 @@ class FullBlockTest(BitcoinIITestFramework):
         tx1.vout.append(CTxOut(0, CScript([OP_TRUE])))
         self.sign_tx(tx1, out[29])
         tx2 = self.create_tx(tx1, 1, 0, CScript([OP_RETURN]))
-        tx2.vout.append(CTxOut(0, CScript([OP_RETURN])))
         tx3 = self.create_tx(tx1, 2, 0, CScript([OP_RETURN]))
         tx3.vout.append(CTxOut(0, CScript([OP_TRUE])))
         tx4 = self.create_tx(tx1, 3, 0, CScript([OP_TRUE]))
