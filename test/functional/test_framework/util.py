@@ -26,7 +26,7 @@ from .descriptors import descsum_create
 from collections.abc import Callable
 from typing import Optional, Union
 
-SAT2OOSHI_PRECISION = Decimal('0.00000001')
+SATOOSHI_PRECISION = Decimal('0.00000001')
 
 logger = logging.getLogger("TestFramework.utils")
 
@@ -396,7 +396,7 @@ def get_fee(tx_size, feerate_bc2_kvb):
 
 def satooshi_round(amount: Union[int, float, str], *, rounding: str) -> Decimal:
     """Rounds a Decimal amount to the nearest satooshi using the specified rounding mode."""
-    return Decimal(amount).quantize(SAT2OOSHI_PRECISION, rounding=rounding)
+    return Decimal(amount).quantize(SATOOSHI_PRECISION, rounding=rounding)
 
 
 def ensure_for(*, duration, f, check_interval=0.2):
