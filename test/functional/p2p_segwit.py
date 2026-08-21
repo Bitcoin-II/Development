@@ -966,6 +966,9 @@ class SegWitTest(BitcoinIITestFramework):
         assert_not_equal(self.nodes[0].getbestblockhash(), block.hash_hex)
 
         # Now redo commitment with the standard nonce, but let bitcoinIId fill it in.
+        # BitcoinII permits only one OP_RETURN output per transaction, so
+        # replace the previous witness commitment instead of appending another.
+        block.vtx[0].vout.pop()
         add_witness_commitment(block, nonce=0)
         block.vtx[0].wit = CTxWitness()
         block.solve()
