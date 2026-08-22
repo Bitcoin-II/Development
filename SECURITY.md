@@ -5,11 +5,8 @@ specific to BitcoinII should be reported directly to the upstream BitcoinII
 Core project.
 
 Security vulnerabilities introduced by BitcoinII-specific changes,
-including the RocksDB integration and storage implementation, should be
-reported to the BitcoinII developers.
-
-Vulnerabilities confirmed to originate within RocksDB itself should also be
-reported to the upstream RocksDB project.
+including consensus, policy, networking, branding, and application
+integration changes, should be reported to the BitcoinII developers.
 
 
 ## Supported Versions

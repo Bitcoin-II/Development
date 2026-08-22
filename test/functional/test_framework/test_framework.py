@@ -168,7 +168,7 @@ class BitcoinIITestFramework(metaclass=BitcoinIITestMetaClass):
         previous_releases_path = os.getenv("PREVIOUS_RELEASES_DIR") or os.getcwd() + "/releases"
         parser = argparse.ArgumentParser(usage="%(prog)s [options]")
         parser.add_argument("--nocleanup", dest="nocleanup", default=False, action="store_true",
-                            help="Leave bitcoinIIds and test.* datadir on exit or error")
+                            help="Leave bitcoinII-ds and test.* datadir on exit or error")
         parser.add_argument("--cachedir", dest="cachedir", default=os.path.abspath(os.path.dirname(test_file) + "/../cache"),
                             help="Directory for caching pregenerated datadirs (default: %(default)s)")
         parser.add_argument("--tmpdir", dest="tmpdir", help="Root directory for datadirs (must not exist)")
@@ -496,7 +496,7 @@ class BitcoinIITestFramework(metaclass=BitcoinIITestMetaClass):
                 test_node_i.replace_in_config([('[regtest]', '')])
 
     def start_node(self, i, *args, **kwargs):
-        """Start a bitcoinIId"""
+        """Start a bitcoinII-d"""
 
         node = self.nodes[i]
 
@@ -507,7 +507,7 @@ class BitcoinIITestFramework(metaclass=BitcoinIITestMetaClass):
             coverage.write_all_rpc_commands(self.options.coveragedir, node._rpc)
 
     def start_nodes(self, extra_args=None, *args, **kwargs):
-        """Start multiple bitcoinIIds"""
+        """Start multiple bitcoinII-ds"""
 
         if extra_args is None:
             extra_args = [None] * self.num_nodes
@@ -522,11 +522,11 @@ class BitcoinIITestFramework(metaclass=BitcoinIITestMetaClass):
                 coverage.write_all_rpc_commands(self.options.coveragedir, node._rpc)
 
     def stop_node(self, i, expected_stderr='', wait=0):
-        """Stop a bitcoinIId test node"""
+        """Stop a bitcoinII-d test node"""
         self.nodes[i].stop_node(expected_stderr, wait=wait)
 
     def stop_nodes(self, wait=0):
-        """Stop multiple bitcoinIId test nodes"""
+        """Stop multiple bitcoinII-d test nodes"""
         for node in self.nodes:
             # Issue RPC to stop nodes
             node.stop_node(wait=wait, wait_until_stopped=False)
@@ -662,7 +662,7 @@ class BitcoinIITestFramework(metaclass=BitcoinIITestMetaClass):
         return blocks
 
     def create_outpoints(self, node, *, outputs):
-        """Send funds to a given list of `{address: amount}` targets using the bitcoinIId
+        """Send funds to a given list of `{address: amount}` targets using the bitcoinII-d
         wallet and return the corresponding outpoints as a list of dictionaries
         `[{"txid": txid, "vout": vout1}, {"txid": txid, "vout": vout2}, ...]`.
         The result can be used to specify inputs for RPCs like `createrawtransaction`,
@@ -863,7 +863,7 @@ class BitcoinIITestFramework(metaclass=BitcoinIITestMetaClass):
         ll = int(self.options.loglevel) if self.options.loglevel.isdigit() else self.options.loglevel.upper()
         ch.setLevel(ll)
 
-        # Format logs the same as bitcoinIId's debug.log with microprecision (so log files can be concatenated and sorted)
+        # Format logs the same as bitcoinII-d's debug.log with microprecision (so log files can be concatenated and sorted)
         class MicrosecondFormatter(logging.Formatter):
             def formatTime(self, record, _=None):
                 dt = datetime.fromtimestamp(record.created, timezone.utc)
@@ -994,10 +994,10 @@ class BitcoinIITestFramework(metaclass=BitcoinIITestMetaClass):
         except ImportError:
             raise SkipTest("bcc python module not available")
 
-    def skip_if_no_bitcoinIId_tracepoints(self):
-        """Skip the running test if bitcoinIId has not been compiled with USDT tracepoint support."""
+    def skip_if_no_bitcoinII_d_tracepoints(self):
+        """Skip the running test if bitcoinII-d has not been compiled with USDT tracepoint support."""
         if not self.is_usdt_compiled():
-            raise SkipTest("bitcoinIId has not been built with USDT tracepoints enabled.")
+            raise SkipTest("bitcoinII-d has not been built with USDT tracepoints enabled.")
 
     def skip_if_no_bpf_permissions(self):
         """Skip the running test if we don't have permissions to do BPF syscalls and load BPF maps."""
@@ -1015,10 +1015,10 @@ class BitcoinIITestFramework(metaclass=BitcoinIITestMetaClass):
         if os.name != 'posix':
             raise SkipTest("not on a POSIX system")
 
-    def skip_if_no_bitcoinIId_zmq(self):
-        """Skip the running test if bitcoinIId has not been compiled with zmq support."""
+    def skip_if_no_bitcoinII_d_zmq(self):
+        """Skip the running test if bitcoinII-d has not been compiled with zmq support."""
         if not self.is_zmq_compiled():
-            raise SkipTest("bitcoinIId has not been built with zmq enabled.")
+            raise SkipTest("bitcoinII-d has not been built with zmq enabled.")
 
     def skip_if_no_wallet(self):
         """Skip the running test if wallet has not been compiled."""

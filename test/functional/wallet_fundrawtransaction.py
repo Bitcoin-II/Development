@@ -1455,7 +1455,7 @@ class RawTransactionsTest(BitcoinIITestFramework):
         # If rounding up, then the calculated fee will be 126 + 78 = 204.
         # In the former case, the calculated needed fee is higher than the actual fee being paid, so an assertion is reached
         # To test this does not happen, we subtract 202 sat2s from the input value. If working correctly, this should
-        # fail with insufficient funds rather than bitcoinIId asserting.
+        # fail with insufficient funds rather than bitcoinII-d asserting.
         rawtx = w.createrawtransaction(inputs=[], outputs=[{self.nodes[0].getnewaddress(address_type="bech32"): 1 - 0.00000202}])
         expected_err_msg = "The total exceeds your balance when the 0.00000078 transaction fee is included."
         assert_raises_rpc_error(-4, expected_err_msg, w.fundrawtransaction, rawtx, fee_rate=1.85)

@@ -189,7 +189,7 @@ class ConfArgsTest(BitcoinIITestFramework):
         self.log.info('Test that correct configuration path is changed when configuration file changes the datadir')
 
         # Create a temporary directory that will be treated as the default data
-        # directory by bitcoinIId.
+        # directory by bitcoinII-d.
         env, default_datadir = util.get_temp_default_datadir(Path(self.options.tmpdir, "test_config_file_log"))
         default_datadir.mkdir(parents=True)
 
@@ -461,7 +461,7 @@ class ConfArgsTest(BitcoinIITestFramework):
                       'and it contains a different bitcoinII.conf file that would be ignored')
 
         # Create a temporary directory that will be treated as the default data
-        # directory by bitcoinIId.
+        # directory by bitcoinII-d.
         env, default_datadir = util.get_temp_default_datadir(Path(self.options.tmpdir, "home"))
         default_datadir.mkdir(parents=True)
 

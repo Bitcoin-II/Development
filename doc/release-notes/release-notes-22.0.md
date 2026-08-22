@@ -22,7 +22,7 @@ How to Upgrade
 If you are running an older version, shut it down. Wait until it has completely
 shut down (which might take a few minutes in some cases), then run the
 installer (on Windows) or just copy over `/Applications/BitcoinII-Qt` (on Mac)
-or `bitcoinIId`/`bitcoinII-qt` (on Linux).
+or `bitcoinII-d`/`bitcoinII-qt` (on Linux).
 
 Upgrading directly from a version of BitcoinII Core that has reached its EOL is
 possible, but it might take some time if the data directory needs to be migrated. Old
@@ -152,7 +152,7 @@ Updated settings
 
 Changes to Wallet or GUI related settings can be found in the GUI or Wallet section below.
 
-- Passing an invalid `-rpcauth` argument now cause bitcoinIId to fail to start.  (#20461)
+- Passing an invalid `-rpcauth` argument now cause bitcoinII-d to fail to start.  (#20461)
 
 Tools and Utilities
 -------------------
@@ -411,7 +411,7 @@ A detailed list of changes in this version follows. To keep the list to a manage
 - bitcoinII/bitcoinII#22686 Use GetSelectionAmount in ApproximateBestSubset (achow101)
 
 ### RPC and other APIs
-- bitcoinII/bitcoinII#18335, bitcoinII/bitcoinII#21484 cli: Print useful error if bitcoinIId rpc work queue exceeded (LarryRuane)
+- bitcoinII/bitcoinII#18335, bitcoinII/bitcoinII#21484 cli: Print useful error if bitcoinII-d rpc work queue exceeded (LarryRuane)
 - bitcoinII/bitcoinII#18466 Fix invalid parameter error codes for `{sign,verify}message` RPCs (theStack)
 - bitcoinII/bitcoinII#18772 Calculate fees in `getblock` using BlockUndo data (robot-visions)
 - bitcoinII/bitcoinII#19033 http: Release work queue after event base finish (promag)
@@ -896,10 +896,10 @@ A detailed list of changes in this version follows. To keep the list to a manage
 - bitcoinII/bitcoinII#20715 util: Add argsmanager::getcommand() and use it in bitcoinII-wallet (MarcoFalke)
 - bitcoinII/bitcoinII#20735 script: Remove outdated extract-osx-sdk.sh (hebasto)
 - bitcoinII/bitcoinII#20817 lint: Update list of spelling linter false positives, bump to codespell 2.0.0 (theStack)
-- bitcoinII/bitcoinII#20884 script: Improve robustness of bitcoinIId.service on startup (hebasto)
+- bitcoinII/bitcoinII#20884 script: Improve robustness of bitcoinII-d.service on startup (hebasto)
 - bitcoinII/bitcoinII#20906 contrib: Embed c++11 patch in `install_db4.sh` (gruve-p)
 - bitcoinII/bitcoinII#21004 contrib: Fix docker args conditional in gitian-build (setpill)
-- bitcoinII/bitcoinII#21007 bitcoinIId: Add -daemonwait option to wait for initialization (laanwj)
+- bitcoinII/bitcoinII#21007 bitcoinII-d: Add -daemonwait option to wait for initialization (laanwj)
 - bitcoinII/bitcoinII#21041 log: Move "Pre-allocating up to position 0x[…] in […].dat" log message to debug category (practicalswift)
 - bitcoinII/bitcoinII#21059 Drop boost/preprocessor dependencies (hebasto)
 - bitcoinII/bitcoinII#21087 guix: Passthrough `BASE_CACHE` into container (dongcarl)

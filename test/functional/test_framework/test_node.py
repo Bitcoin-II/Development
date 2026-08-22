@@ -2,7 +2,7 @@
 # Copyright (c) 2017-present The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
-"""Class for bitcoinIId node under test"""
+"""Class for bitcoinII-d node under test"""
 
 import contextlib
 import decimal
@@ -79,7 +79,7 @@ class ErrorMatch(Enum):
 
 
 class TestNode():
-    """A class for representing a bitcoinIId node under test.
+    """A class for representing a bitcoinII-d node under test.
 
     This class contains:
 
@@ -143,14 +143,14 @@ class TestNode():
         self.extra_args = extra_args
         self.version = version
         # Configuration for logging is set as command-line args rather than in the bitcoinII.conf file.
-        # This means that starting a bitcoinIId using the temp dir to debug a failed test won't
+        # This means that starting a bitcoinII-d using the temp dir to debug a failed test won't
         # spam debug.log.
         self.args = self.binaries.node_argv(need_ipc=ipcbind) + [
             f"-datadir={self.datadir_path}",
             "-logtimemicros",
             "-debug",
             "-debugexclude=libevent",
-            "-debugexclude=leveldb" if version is not None else "-debugexclude=rocksdb",
+            "-debugexclude=leveldb",
             "-debugexclude=rand",
             "-uacomment=testnode%d" % i,  # required for subversion uniqueness across peers
         ]
@@ -241,7 +241,7 @@ class TestNode():
         raise AssertionError(self._node_msg(msg))
 
     def __del__(self):
-        # Ensure that we don't leave any bitcoinIId processes lying around after
+        # Ensure that we don't leave any bitcoinII-d processes lying around after
         # the test ends
         if self.process:
             # Should only happen on test failure
@@ -266,7 +266,7 @@ class TestNode():
         if extra_args is None:
             extra_args = self.extra_args
 
-        # If listening and no -bind is given, then bitcoinIId would bind P2P ports on
+        # If listening and no -bind is given, then bitcoinII-d would bind P2P ports on
         # 0.0.0.0:P and 127.0.0.1:P+1 (for incoming Tor connections), where P is
         # a unique port chosen by the test framework and configured as port=P in
         # bitcoinII.conf. To avoid collisions, change it to 127.0.0.1:tor_port().
@@ -278,7 +278,7 @@ class TestNode():
 
         self.use_v2transport = "-v2transport=1" in extra_args or (self.default_to_v2 and "-v2transport=0" not in extra_args)
 
-        # Add a new stdout and stderr file each time bitcoinIId is started
+        # Add a new stdout and stderr file each time bitcoinII-d is started
         if stderr is None:
             stderr = tempfile.NamedTemporaryFile(dir=self.stderr_dir, delete=False)
         if stdout is None:
@@ -290,7 +290,7 @@ class TestNode():
             cwd = self.cwd
 
         # Delete any existing cookie file -- if such a file exists (eg due to
-        # unclean shutdown), it will get overwritten anyway by bitcoinIId, and
+        # unclean shutdown), it will get overwritten anyway by bitcoinII-d, and
         # potentially interfere with our attempt to authenticate
         delete_cookie_file(self.datadir_path, self.chain)
 
@@ -302,13 +302,13 @@ class TestNode():
         self.process = subprocess.Popen(self.args + extra_args, env=subp_env, stdout=stdout, stderr=stderr, cwd=cwd, **kwargs)
 
         self.running = True
-        self.log.debug("bitcoinIId started, waiting for RPC to come up")
+        self.log.debug("bitcoinII-d started, waiting for RPC to come up")
 
         if self.start_perf:
             self._start_perf()
 
     def wait_for_rpc_connection(self, *, wait_for_import=True):
-        """Sets up an RPC connection to the bitcoinIId process. Returns False if unable to connect."""
+        """Sets up an RPC connection to the bitcoinII-d process. Returns False if unable to connect."""
         # Poll at a rate of four times per second
         poll_per_s = 4
 
@@ -326,7 +326,7 @@ class TestNode():
                 str_error += "************************\n" if str_error else ''
 
                 raise FailedToStartError(self._node_msg(
-                    f'bitcoinIId exited with status {self.process.returncode} during initialization. {str_error}'))
+                    f'bitcoinII-d exited with status {self.process.returncode} during initialization. {str_error}'))
             try:
                 rpc = get_rpc_proxy(
                     rpc_url(self.datadir_path, self.index, self.chain, self.rpchost),
@@ -395,12 +395,12 @@ class TestNode():
                     raise  # unknown OS error
                 latest_error = suppress_error(f"OSError {errno.errorcode[error_num]}", e)
             except ValueError as e:
-                # Suppress if cookie file isn't generated yet and no rpcuser or rpcpassword; bitcoinIId may be starting.
+                # Suppress if cookie file isn't generated yet and no rpcuser or rpcpassword; bitcoinII-d may be starting.
                 if "No RPC credentials" not in str(e):
                     raise
                 latest_error = suppress_error("missing_credentials", e)
             time.sleep(1.0 / poll_per_s)
-        self._raise_assertion_error(f"Unable to connect to bitcoinIId after {self.rpc_timeout}s (ignored errors: {dict(suppressed_errors)!s}{'' if latest_error is None else f', latest: {latest_error[0]!r}/{latest_error[1]}'})")
+        self._raise_assertion_error(f"Unable to connect to bitcoinII-d after {self.rpc_timeout}s (ignored errors: {dict(suppressed_errors)!s}{'' if latest_error is None else f', latest: {latest_error[0]!r}/{latest_error[1]}'})")
 
     def wait_for_cookie_credentials(self):
         """Ensures auth cookie credentials can be read, e.g. for testing CLI with -rpcwait before RPC connection is up."""
@@ -412,7 +412,7 @@ class TestNode():
                 get_auth_cookie(self.datadir_path, self.chain)
                 self.log.debug("Cookie credentials successfully retrieved")
                 return
-            except ValueError:  # cookie file not found and no rpcuser or rpcpassword; bitcoinIId is still starting
+            except ValueError:  # cookie file not found and no rpcuser or rpcpassword; bitcoinII-d is still starting
                 pass            # so we continue polling until RPC credentials are retrieved
             time.sleep(1.0 / poll_per_s)
         self._raise_assertion_error("Unable to retrieve cookie credentials after {}s".format(self.rpc_timeout))
@@ -696,7 +696,7 @@ class TestNode():
 
         if not test_success('readelf -S {} | grep .debug_str'.format(shlex.quote(self.binary))):
             self.log.warning(
-                "perf output won't be very useful without debug symbols compiled into bitcoinIId")
+                "perf output won't be very useful without debug symbols compiled into bitcoinII-d")
 
         output_path = tempfile.NamedTemporaryFile(
             dir=self.datadir_path,
@@ -737,19 +737,19 @@ class TestNode():
     def assert_start_raises_init_error(self, extra_args=None, expected_msg=None, match=ErrorMatch.FULL_TEXT, *args, **kwargs):
         """Attempt to start the node and expect it to raise an error.
 
-        extra_args: extra arguments to pass through to bitcoinIId
-        expected_msg: regex that stderr should match when bitcoinIId fails
+        extra_args: extra arguments to pass through to bitcoinII-d
+        expected_msg: regex that stderr should match when bitcoinII-d fails
 
-        Will raise if bitcoinIId starts without an error.
-        Will raise if an expected_msg is provided and it does not match bitcoinIId's stdout."""
+        Will raise if bitcoinII-d starts without an error.
+        Will raise if an expected_msg is provided and it does not match bitcoinII-d's stdout."""
         assert not self.running
-        with tempfile.NamedTemporaryFile(dir=self.stderr_dir, delete=False) as log_stderr, \
+        with tempfile.NamedTemporaryFile(dir=self.stderr_dir, delete=False) as log_stderr,\
              tempfile.NamedTemporaryFile(dir=self.stdout_dir, delete=False) as log_stdout:
             assert_msg = None
             try:
                 self.start(extra_args, stdout=log_stdout, stderr=log_stderr, *args, **kwargs)
                 ret = self.process.wait(timeout=self.rpc_timeout)
-                self.log.debug(self._node_msg(f'bitcoinIId exited with status {ret} during initialization'))
+                self.log.debug(self._node_msg(f'bitcoinII-d exited with status {ret} during initialization'))
                 assert_not_equal(ret, 0) # Exit code must indicate failure
                 self.running = False
                 self.process = None
@@ -773,7 +773,7 @@ class TestNode():
                 self.process.kill()
                 self.running = False
                 self.process = None
-                assert_msg = f'bitcoinIId should have exited within {self.rpc_timeout}s '
+                assert_msg = f'bitcoinII-d should have exited within {self.rpc_timeout}s '
                 if expected_msg is None:
                     assert_msg += "with an error"
                 else:

@@ -4757,26 +4757,17 @@ bool ChainstateManager::AcceptBlock(
     try {
         FlatFilePos blockPos{};
         if (dbp) {
-            assert(dbp_stored_size.has_value());
-
             blockPos = *dbp;
-            m_blockman.UpdateBlockInfo(
-                block,
-                pindex->nHeight,
-                blockPos,
-                *dbp_stored_size
-            );
+            m_blockman.UpdateBlockInfo(block, pindex->nHeight, blockPos);
         } else {
-            assert(!dbp_stored_size.has_value());
-
             blockPos = m_blockman.WriteBlock(block, pindex->nHeight);
             if (blockPos.IsNull()) {
                 state.Error(strprintf("%s: Failed to find position to write new block to disk", __func__));
                 return false;
             }
-         }
-         ReceivedBlockTransactions(block, pindex, blockPos);
-     } catch (const std::runtime_error& e) {
+        }
+        ReceivedBlockTransactions(block, pindex, blockPos);
+    } catch (const std::runtime_error& e) {
         return FatalError(GetNotifications(), state, strprintf(_("System error while saving block to disk: %s"), e.what()));
     }
 
@@ -5355,165 +5346,116 @@ bool Chainstate::LoadGenesisBlock()
 void ChainstateManager::LoadExternalBlockFile(
     AutoFile& file_in,
     FlatFilePos* dbp,
-    std::multimap<uint256, std::pair<FlatFilePos, uint32_t>>*
-        blocks_with_unknown_parent) {
+    std::multimap<uint256, FlatFilePos>* blocks_with_unknown_parent)
+{
+    // Either both should be specified (-reindex), or neither (-loadblock).
     assert(!dbp == !blocks_with_unknown_parent);
 
     const auto start{SteadyClock::now()};
     const CChainParams& params{GetParams()};
+
     int nLoaded = 0;
-
     try {
-        BufferedFile blkdat{
-            file_in,
-            2 * MAX_BLOCK_SERIALIZED_SIZE,
-            MAX_BLOCK_SERIALIZED_SIZE + node::STORAGE_HEADER_BYTES
-        };
-
+        BufferedFile blkdat{file_in, 2 * MAX_BLOCK_SERIALIZED_SIZE, MAX_BLOCK_SERIALIZED_SIZE + 8};
+        // nRewind indicates where to resume scanning in case something goes wrong,
+        // such as a block fails to deserialize.
         uint64_t nRewind = blkdat.GetPos();
-
         while (!blkdat.eof()) {
             if (m_interrupt) return;
 
             blkdat.SetPos(nRewind);
-            nRewind++;
-            blkdat.SetLimit();
-
-            uint32_t size_field{0};
-            uint32_t stored_size{0};
-            bool compressed{false};
-
+            nRewind++; // start one byte further next time, in case of failure
+            blkdat.SetLimit(); // remove former limit
+            unsigned int nSize = 0;
             try {
+                // locate a header
                 MessageStartChars buf;
                 blkdat.FindByte(std::byte(params.MessageStart()[0]));
                 nRewind = blkdat.GetPos() + 1;
                 blkdat >> buf;
-
                 if (buf != params.MessageStart()) {
                     continue;
                 }
-
-                blkdat >> size_field;
-                compressed = node::IsCompressedBlockRecord(size_field);
-                stored_size = node::GetBlockRecordPayloadSize(size_field);
-
-                if (
-                    stored_size == 0 ||
-                    stored_size > MAX_BLOCK_SERIALIZED_SIZE ||
-                    (!compressed && stored_size < 80)
-                ) {
+                // read size
+                blkdat >> nSize;
+                if (nSize < 80 || nSize > MAX_BLOCK_SERIALIZED_SIZE)
                     continue;
-                }
-            } catch (const std::ios_base::failure&) {
-                break;
             } catch (const std::exception&) {
+                // no valid block header found; don't complain
+                // (this happens at the end of every blk.dat file)
                 break;
             }
-
             try {
+                // read block header
                 const uint64_t nBlockPos{blkdat.GetPos()};
-                if (dbp) {
+                if (dbp)
                     dbp->nPos = nBlockPos;
-                }
-
-                blkdat.SetLimit(nBlockPos + stored_size);
-
+                blkdat.SetLimit(nBlockPos + nSize);
                 CBlockHeader header;
-                std::shared_ptr<CBlock> decoded_compressed_block;
-
-                if (compressed) {
-                    std::vector<std::byte> stored(stored_size);
-                    blkdat.read(stored);
-                    std::vector<std::byte> raw{
-                        node::DecompressBlockPayload(stored)
-                    };
-
-                    decoded_compressed_block = std::make_shared<CBlock>();
-                    SpanReader{raw} >> TX_WITH_WITNESS(*decoded_compressed_block);
-                    header = static_cast<const CBlockHeader&>(*decoded_compressed_block);
-
-                    nRewind = nBlockPos + stored_size;
-                    blkdat.SkipTo(nRewind);
-                } else {
-                    blkdat >> header;
-                    nRewind = nBlockPos + stored_size;
-                    blkdat.SkipTo(nRewind);
-                }
-
+                blkdat >> header;
                 const uint256 hash{header.GetHash()};
-                std::shared_ptr<CBlock> pblock{};
+                // Skip the rest of this block (this may read from disk into memory); position to the marker before the
+                // next block, but it's still possible to rewind to the start of the current block (without a disk read).
+                nRewind = nBlockPos + nSize;
+                blkdat.SkipTo(nRewind);
+
+                std::shared_ptr<CBlock> pblock{}; // needs to remain available after the cs_main lock is released to avoid duplicate reads from disk
 
                 {
                     LOCK(cs_main);
-
-                    if (
-                        hash != params.GetConsensus().hashGenesisBlock &&
-                        !m_blockman.LookupBlockIndex(header.hashPrevBlock)
-                    ) {
-                        LogDebug(
-                            BCLog::REINDEX,
-                            "%s: Out of order block %s, parent %s not known\n",
-                            __func__,
-                            hash.ToString(),
-                            header.hashPrevBlock.ToString()
-                        );
-
+                    // detect out of order blocks, and store them for later
+                    if (hash != params.GetConsensus().hashGenesisBlock && !m_blockman.LookupBlockIndex(header.hashPrevBlock)) {
+                        LogDebug(BCLog::REINDEX, "%s: Out of order block %s, parent %s not known\n", __func__, hash.ToString(),
+                                 header.hashPrevBlock.ToString());
                         if (dbp && blocks_with_unknown_parent) {
-                            blocks_with_unknown_parent->emplace(
-                               header.hashPrevBlock,
-                               std::make_pair(*dbp, stored_size)
-                            );
+                            blocks_with_unknown_parent->emplace(header.hashPrevBlock, *dbp);
                         }
                         continue;
                     }
 
-                    const CBlockIndex* pindex{m_blockman.LookupBlockIndex(hash)};
-
+                    // process in case the block isn't known yet
+                    const CBlockIndex* pindex = m_blockman.LookupBlockIndex(hash);
                     if (!pindex || (pindex->nStatus & BLOCK_HAVE_DATA) == 0) {
-                        if (compressed) {
-                            pblock = std::move(decoded_compressed_block);
-                        } else {
-                            blkdat.SetPos(nBlockPos);
-                            pblock = std::make_shared<CBlock>();
-                            blkdat >> TX_WITH_WITNESS(*pblock);
-                            nRewind = blkdat.GetPos();
-                        }
+                        // This block can be processed immediately; rewind to its start, read and deserialize it.
+                        blkdat.SetPos(nBlockPos);
+                        pblock = std::make_shared<CBlock>();
+                        blkdat >> TX_WITH_WITNESS(*pblock);
+                        nRewind = blkdat.GetPos();
 
                         BlockValidationState state;
-                        if (AcceptBlock(pblock, state, nullptr, true, dbp, nullptr, true, dbp ? std::optional<uint32_t>{stored_size} : std::nullopt)) {
+                        if (AcceptBlock(pblock, state, nullptr, true, dbp, nullptr, true)) {
                             nLoaded++;
                         }
                         if (state.IsError()) {
                             break;
                         }
-                    } else if (
-                        hash != params.GetConsensus().hashGenesisBlock &&
-                        pindex->nHeight % 1000 == 0
-                    ) {
-                        LogDebug(
-                            BCLog::REINDEX,
-                            "Block Import: already had block %s at height %d\n",
-                            hash.ToString(),
-                            pindex->nHeight
-                        );
+                    } else if (hash != params.GetConsensus().hashGenesisBlock && pindex->nHeight % 1000 == 0) {
+                        LogDebug(BCLog::REINDEX, "Block Import: already had block %s at height %d\n", hash.ToString(), pindex->nHeight);
                     }
                 }
 
-                if (
-                    hash == params.GetConsensus().hashGenesisBlock &&
-                    WITH_LOCK(::cs_main, return ActiveHeight()) == -1
-                ) {
+                // Activate the genesis block so normal node progress can continue
+                // During first -reindex, this will only connect Genesis since
+                // ActivateBestChain only connects blocks which are in the block tree db,
+                // which only contains blocks whose parents are in it.
+                // But do this only if genesis isn't activated yet, to avoid connecting many blocks
+                // without assumevalid in the case of a continuation of a reindex that
+                // was interrupted by the user.
+                if (hash == params.GetConsensus().hashGenesisBlock && WITH_LOCK(::cs_main, return ActiveHeight()) == -1) {
                     BlockValidationState state;
                     if (!ActiveChainstate().ActivateBestChain(state, nullptr)) {
                         break;
                     }
                 }
 
-                if (
-                    m_blockman.IsPruneMode() &&
-                    m_blockman.m_blockfiles_indexed &&
-                    pblock
-                ) {
+                if (m_blockman.IsPruneMode() && m_blockman.m_blockfiles_indexed && pblock) {
+                    // must update the tip for pruning to work while importing with -loadblock.
+                    // this is a tradeoff to conserve disk space at the expense of time
+                    // spent updating the tip to be able to prune.
+                    // otherwise, ActivateBestChain won't be called by the import process
+                    // until after all of the block files are loaded. ActivateBestChain can be
+                    // called by concurrent network message processing. but, that is not
+                    // reliable for the purpose of pruning while importing.
                     if (auto result{ActivateBestChains()}; !result) {
                         LogDebug(BCLog::REINDEX, "%s\n", util::ErrorString(result).original);
                         break;
@@ -5522,83 +5464,52 @@ void ChainstateManager::LoadExternalBlockFile(
 
                 NotifyHeaderTip();
 
-                if (!blocks_with_unknown_parent) {
-                    continue;
-                }
+                if (!blocks_with_unknown_parent) continue;
 
+                // Recursively process earlier encountered successors of this block
                 std::deque<uint256> queue;
                 queue.push_back(hash);
-
                 while (!queue.empty()) {
                     uint256 head = queue.front();
                     queue.pop_front();
-                    auto range{blocks_with_unknown_parent->equal_range(head)};
-
+                    auto range = blocks_with_unknown_parent->equal_range(head);
                     while (range.first != range.second) {
-                       auto it = range.first;
-                       auto pblockrecursive = std::make_shared<CBlock>();
-
-                       const FlatFilePos child_pos{it->second.first};
-                       const uint32_t child_stored_size{it->second.second};
-
-                       if (m_blockman.ReadBlock(*pblockrecursive, child_pos, {})) {
-                           const auto& block_hash{pblockrecursive->GetHash()};
-                           LogDebug(
-                               BCLog::REINDEX,
-                               "%s: Processing out of order child %s of %s",
-                               __func__,
-                               block_hash.ToString(),
-                               head.ToString()
-                       );
-
-                       LOCK(cs_main);
-                       BlockValidationState dummy;
-                       if (
-                           AcceptBlock(
-                           pblockrecursive,
-                           dummy,
-                           nullptr,
-                           true,
-                           &child_pos,
-                           nullptr,
-                           true,
-                           child_stored_size
-                           )
-                       ) {
-                           nLoaded++;
-                           queue.push_back(block_hash);
-                       }
+                        std::multimap<uint256, FlatFilePos>::iterator it = range.first;
+                        std::shared_ptr<CBlock> pblockrecursive = std::make_shared<CBlock>();
+                        if (m_blockman.ReadBlock(*pblockrecursive, it->second, {})) {
+                            const auto& block_hash{pblockrecursive->GetHash()};
+                            LogDebug(BCLog::REINDEX, "%s: Processing out of order child %s of %s", __func__, block_hash.ToString(), head.ToString());
+                            LOCK(cs_main);
+                            BlockValidationState dummy;
+                            if (AcceptBlock(pblockrecursive, dummy, nullptr, true, &it->second, nullptr, true)) {
+                                nLoaded++;
+                                queue.push_back(block_hash);
+                            }
+                        }
+                        range.first++;
+                        blocks_with_unknown_parent->erase(it);
+                        NotifyHeaderTip();
                     }
-
-                    range.first++;
-                    blocks_with_unknown_parent->erase(it);
-                    NotifyHeaderTip();
-                 }
-              }
+                }
             } catch (const std::exception& e) {
-                LogDebug(
-                    BCLog::REINDEX,
-                    "%s: unexpected data at file offset 0x%x - %s. continuing\n",
-                    __func__,
-                    (nRewind - 1),
-                    e.what()
-                );
+                // historical bugs added extra data to the block files that does not deserialize cleanly.
+                // commonly this data is between readable blocks, but it does not really matter. such data is not fatal to the import process.
+                // the code that reads the block files deals with invalid data by simply ignoring it.
+                // it continues to search for the next {4 byte magic message start bytes + 4 byte length + block} that does deserialize cleanly
+                // and passes all of the other block validation checks dealing with POW and the merkle root, etc...
+                // we merely note with this informational log message when unexpected data is encountered.
+                // we could also be experiencing a storage system read error, or a read of a previous bad write. these are possible, but
+                // less likely scenarios. we don't have enough information to tell a difference here.
+                // the reindex process is not the place to attempt to clean and/or compact the block files. if so desired, a studious node operator
+                // may use knowledge of the fact that the block files are not entirely pristine in order to prepare a set of pristine, and
+                // perhaps ordered, block files for later reindexing.
+                LogDebug(BCLog::REINDEX, "%s: unexpected data at file offset 0x%x - %s. continuing\n", __func__, (nRewind - 1), e.what());
             }
         }
     } catch (const std::runtime_error& e) {
-        GetNotifications().fatalError(
-            strprintf(
-                _("System error while loading external block file: %s"),
-                e.what()
-            )
-        );
+        GetNotifications().fatalError(strprintf(_("System error while loading external block file: %s"), e.what()));
     }
-
-    LogInfo(
-        "Loaded %i blocks from external file in %dms",
-        nLoaded,
-        Ticks<std::chrono::milliseconds>(SteadyClock::now() - start)
-    );
+    LogInfo("Loaded %i blocks from external file in %dms", nLoaded, Ticks<std::chrono::milliseconds>(SteadyClock::now() - start));
 }
 
 bool ChainstateManager::ShouldCheckBlockIndex() const
@@ -6032,21 +5943,21 @@ Chainstate& ChainstateManager::InitializeChainstate(CTxMemPool* mempool)
     }
 
     std::string path_str = fs::PathToString(db_path);
-    LogInfo("Removing database dir at %s\n", path_str);
+    LogInfo("Removing leveldb dir at %s\n", path_str);
 
-    // The database handle must be destructed before this call in order to release
-    // the database lock; otherwise `DestroyDB` will fail.
+    // We have to destruct before this call leveldb::DB in order to release the db
+    // lock, otherwise `DestroyDB` will fail. See `leveldb::~DBImpl()`.
     const bool destroyed = DestroyDB(path_str);
 
     if (!destroyed) {
-        LogError("RocksDB DestroyDB call failed on %s", path_str);
+        LogError("leveldb DestroyDB call failed on %s", path_str);
     }
 
     // Datadir should be removed from filesystem; otherwise initialization may detect
     // it on subsequent statups and get confused.
     //
     // If the base_blockhash_path removal above fails in the case of snapshot
-    // chainstates, this will return false since database cleanup will not remove a non-empty
+    // chainstates, this will return false since leveldb won't remove a non-empty
     // directory.
     return destroyed && !fs::exists(db_path);
 }
@@ -6143,11 +6054,11 @@ util::Result<CBlockIndex*> ChainstateManager::ActivateSnapshot(
     auto cleanup_bad_snapshot = [&](bilingual_str reason) EXCLUSIVE_LOCKS_REQUIRED(::cs_main) {
         this->MaybeRebalanceCaches();
 
-        // PopulateAndValidateSnapshot can return (in error) before the database directory
+        // PopulateAndValidateSnapshot can return (in error) before the leveldb datadir
         // has been created, so only attempt removal if we got that far.
         if (auto snapshot_datadir = node::FindAssumeutxoChainstateDir(m_options.datadir)) {
-            // The database handle must be destructed in order to release the database lock;
-            // otherwise DestroyDB() (in DeleteCoinsDBFromDisk()) will fail.
+            // We have to destruct leveldb::DB in order to release the db lock, otherwise
+            // DestroyDB() (in DeleteCoinsDBFromDisk()) will fail. See `leveldb::~DBImpl()`.
             // Destructing the chainstate (and so resetting the coinsviews object) does this.
             snapshot_chainstate.reset();
             bool removed = DeleteCoinsDBFromDisk(*snapshot_datadir, /*is_snapshot=*/true);
@@ -6522,7 +6433,7 @@ SnapshotCompletionResult ChainstateManager::MaybeValidateSnapshot(Chainstate& va
     // assumeutxo hash we expect.
     //
     // TODO: For belt-and-suspenders, we could cache the UTXO set
-    // hash for the snapshot when it's loaded in its chainstate database. We could then
+    // hash for the snapshot when it's loaded in its chainstate's leveldb. We could then
     // reference that here for an additional check.
     if (AssumeutxoHash{validated_cs_stats->hashSerialized} != au_data.hash_serialized) {
         LogWarning("[snapshot] hash mismatch: actual=%s, expected=%s",
@@ -6755,7 +6666,7 @@ bool ChainstateManager::ValidatedSnapshotCleanup(Chainstate& validated_cs, Chain
     const fs::path assumed_valid_path{unvalidated_cs.StoragePath()};
     const fs::path delete_path{validated_path + "_todelete"};
 
-    // Since we're going to be moving around the underlying database filesystem contents
+    // Since we're going to be moving around the underlying leveldb filesystem content
     // for each chainstate, make sure that the chainstates (and their constituent
     // CoinsViews members) have been destructed first.
     //
@@ -6775,7 +6686,7 @@ bool ChainstateManager::ValidatedSnapshotCleanup(Chainstate& validated_cs, Chain
                   fs::PathToString(p_old), fs::PathToString(p_new), err.what());
         GetNotifications().fatalError(strprintf(_(
             "Rename of '%s' -> '%s' failed. "
-            "Cannot clean up the background chainstate database directory."),
+            "Cannot clean up the background chainstate leveldb directory."),
             fs::PathToString(p_old), fs::PathToString(p_new)));
     };
 

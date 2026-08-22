@@ -24,7 +24,7 @@ Several shutdown issues have been fixed.
 Check that keys stored in the wallet are valid at startup, and if not,
 report corruption.
 Various build fixes.
-If no password is specified to bitcoinIId, recommend a secure password.
+If no password is specified to bitcoinII-d, recommend a secure password.
 Update hard-coded fallback seed nodes, choosing recent ones with long uptime and versions at least 0.4.0.
 Add checkpoint at block 168,000.
 

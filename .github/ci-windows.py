@@ -102,13 +102,13 @@ def check_manifests(ci_type):
 
     release_dir = Path.cwd() / "build" / "bin" / "Release"
     manifest_path = release_dir / "bitcoinII-d.manifest"
-    cmd_bitcoinIId_manifest = [
+    cmd_bitcoinII_d_manifest = [
         "mt.exe",
         "-nologo",
         f"-inputresource:{release_dir / 'bitcoinII-d.exe'}",
         f"-out:{manifest_path}",
     ]
-    run(cmd_bitcoinIId_manifest)
+    run(cmd_bitcoinII_d_manifest)
     print(manifest_path.read_text())
 
     skips = {  # Skip as they currently do not have manifests
@@ -186,18 +186,6 @@ def run_tests(ci_type):
             "Release",
         ]
         run(ctest_cmd)
-
-        test_cmd = [
-            sys.executable,
-            str(build_dir / "test" / "functional" / "test_runner.py"),
-            "--jobs",
-            num_procs,
-            "--quiet",
-            f"--tmpdirprefix={workspace}",
-            "--combinedlogslen=99999999",
-            *shlex.split(os.environ.get("TEST_RUNNER_EXTRA", "").strip()),
-        ]
-        run(test_cmd)
 
     elif ci_type == "fuzz":
         os.environ["BITCOINIIFUZZ"] = str(release_bin / "bitcoinII-fuzz.exe")

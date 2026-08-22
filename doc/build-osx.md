@@ -2,7 +2,7 @@
 
 **Updated for MacOS [26](https://www.apple.com/os/macos/)**
 
-This guide describes how to build bitcoinIId, command-line utilities, and GUI on macOS.
+This guide describes how to build bitcoinII-d, command-line utilities, and GUI on macOS.
 
 ## Preparation
 
@@ -183,14 +183,14 @@ cmake --build build --target deploy
 
 ## Running BitcoinII Core
 
-BitcoinII Core should now be available at `./build/bin/bitcoinIId`.
+BitcoinII Core should now be available at `./build/bin/bitcoinII-d`.
 If you compiled support for the GUI, it should be available at `./build/bin/bitcoinII-qt`.
 
 There is also a multifunction command line interface at `./build/bin/bitcoinII`
 supporting subcommands like `bitcoinII node`, `bitcoinII gui`, `bitcoinII rpc`, and
 others that can be listed with `bitcoinII help`.
 
-The first time you run `bitcoinIId` or `bitcoinII-qt`, it will start downloading the blockchain.
+The first time you run `bitcoinII-d` or `bitcoinII-qt`, it will start downloading the blockchain.
 This process could take many hours, or even days on slower than average systems.
 
 By default, blockchain and wallet data files will be stored in:
@@ -218,7 +218,7 @@ tail -f $HOME/Library/Application\ Support/BitcoinII/debug.log
 ## Other commands:
 
 ```shell
-./build/bin/bitcoinIId -daemon      # Starts the bitcoinII daemon.
+./build/bin/bitcoinII-d -daemon      # Starts the bitcoinII daemon.
 ./build/bin/bitcoinII-cli --help    # Outputs a list of command-line options.
 ./build/bin/bitcoinII-cli help      # Outputs a list of RPC commands when the daemon is running.
 ./build/bin/bitcoinII-qt -server # Starts the bitcoinII-qt server mode, allows bitcoinII-cli control

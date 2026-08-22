@@ -41,7 +41,7 @@ Core configuration options:
 In a typical situation, this suffices:
 
 ```
-bitcoinIId -i2psam=127.0.0.1:7656
+bitcoinII-d -i2psam=127.0.0.1:7656
 ```
 
 ## Additional configuration options related to I2P

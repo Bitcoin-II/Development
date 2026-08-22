@@ -19,7 +19,7 @@ How to Upgrade
 If you are running an older version, shut it down. Wait until it has completely
 shut down (which might take a few minutes in some cases), then run the
 installer (on Windows) or just copy over `/Applications/BitcoinII-Qt` (on macOS)
-or `bitcoinIId`/`bitcoinII-qt` (on Linux).
+or `bitcoinII-d`/`bitcoinII-qt` (on Linux).
 
 Upgrading directly from a version of BitcoinII Core that has reached its EOL is
 possible, but it might take some time if the data directory needs to be migrated. Old
@@ -28,8 +28,8 @@ wallet versions of BitcoinII Core are generally supported.
 Running BitcoinII Core binaries on macOS requires self signing.
 ```
 cd /path/to/bitcoinII-28.0/bin
-xattr -d com.apple.quarantine bitcoinII-cli bitcoinII-qt bitcoinII-tx bitcoinII-util bitcoinII-wallet bitcoinIId test_bitcoinII
-codesign -s - bitcoinII-cli bitcoinII-qt bitcoinII-tx bitcoinII-util bitcoinII-wallet bitcoinIId test_bitcoinII
+xattr -d com.apple.quarantine bitcoinII-cli bitcoinII-qt bitcoinII-tx bitcoinII-util bitcoinII-wallet bitcoinII-d test_bitcoinII
+codesign -s - bitcoinII-cli bitcoinII-qt bitcoinII-tx bitcoinII-util bitcoinII-wallet bitcoinII-d test_bitcoinII
 ```
 
 Compatibility

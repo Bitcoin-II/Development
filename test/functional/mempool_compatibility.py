@@ -11,7 +11,7 @@ Previous releases are required by this test, see test/README.md.
 """
 
 from test_framework.blocktools import COINBASE_MATURITY
-from test_framework.test_framework import BitcoinIITestFramework
+from test_framework.test_framework import BitcoinIITestFramework, SkipTest
 from test_framework.wallet import (
     MiniWallet,
     MiniWalletMode,
@@ -24,7 +24,7 @@ class MempoolCompatibilityTest(BitcoinIITestFramework):
         self.setup_clean_chain = True
 
     def skip_test_if_missing_module(self):
-        self.skip_if_no_previous_releases()
+        raise SkipTest("Bitcoin Core previous-release binaries are not valid compatibility fixtures for BitcoinII")
 
     def setup_network(self):
         self.add_nodes(self.num_nodes, versions=[

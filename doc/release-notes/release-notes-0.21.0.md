@@ -22,7 +22,7 @@ How to Upgrade
 If you are running an older version, shut it down. Wait until it has completely
 shut down (which might take a few minutes in some cases), then run the
 installer (on Windows) or just copy over `/Applications/BitcoinII-Qt` (on Mac)
-or `bitcoinIId`/`bitcoinII-qt` (on Linux).
+or `bitcoinII-d`/`bitcoinII-qt` (on Linux).
 
 Upgrading directly from a version of BitcoinII Core that has reached its EOL is
 possible, but it might take some time if the data directory needs to be migrated. Old
@@ -1161,7 +1161,7 @@ Tests
 - #19765 Fix getmempoolancestors RPC result doc (MarcoFalke)
 - #19786 Remove label from good first issue template (MarcoFalke)
 - #19646 Updated outdated help command for getblocktemplate (jakeleventhal)
-- #18817 Document differences in bitcoinIId and bitcoinII-qt locale handling (practicalswift)
+- #18817 Document differences in bitcoinII-d and bitcoinII-qt locale handling (practicalswift)
 - #19870 update PyZMQ install instructions, fix `zmq_sub.py` file permissions (jonatack)
 - #19903 Update build-openbsd.md with GUI support (grubles)
 - #19241 help: Generate checkpoint height from chainparams (luke-jr)

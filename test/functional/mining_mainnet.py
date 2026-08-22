@@ -14,7 +14,7 @@ order to maximally raise the difficulty. Verify this using the getmininginfo RPC
 
 """
 
-from test_framework.test_framework import BitcoinIITestFramework
+from test_framework.test_framework import BitcoinIITestFramework, SkipTest
 from test_framework.util import (
     assert_equal,
 )
@@ -45,6 +45,9 @@ class MiningMainnetTest(BitcoinIITestFramework):
         self.num_nodes = 1
         self.setup_clean_chain = True
         self.chain = "" # main
+
+    def skip_test_if_missing_module(self):
+        raise SkipTest("Bitcoin Core alternate-mainnet nonce fixture is not valid for BitcoinII")
 
     def add_options(self, parser):
         parser.add_argument(

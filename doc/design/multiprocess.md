@@ -10,7 +10,7 @@ The BitcoinII Core software has historically employed a monolithic architecture.
 
 ## Current Architecture
 
-The current system features two primary executables: `bitcoinIId` and `bitcoinII-qt`. `bitcoinIId` combines a BitcoinII P2P node with an integrated JSON-RPC server, wallet, and indexes. `bitcoinII-qt` extends this by incorporating a Qt-based GUI. This monolithic structure, although robust, presents challenges such as limited operational flexibility and increased security risks due to the tight integration of components.
+The current system features two primary executables: `bitcoinII-d` and `bitcoinII-qt`. `bitcoinII-d` combines a BitcoinII P2P node with an integrated JSON-RPC server, wallet, and indexes. `bitcoinII-qt` extends this by incorporating a Qt-based GUI. This monolithic structure, although robust, presents challenges such as limited operational flexibility and increased security risks due to the tight integration of components.
 
 ## Proposed Architecture
 

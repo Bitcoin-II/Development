@@ -19,7 +19,7 @@ How to Upgrade
 If you are running an older version, shut it down. Wait until it has completely
 shut down (which might take a few minutes in some cases), then run the
 installer (on Windows) or just copy over `/Applications/BitcoinII-Qt` (on macOS)
-or `bitcoinIId`/`bitcoinII-qt` (on Linux).
+or `bitcoinII-d`/`bitcoinII-qt` (on Linux).
 
 Upgrading directly from a version of BitcoinII Core that has reached its EOL is
 possible, but it might take some time if the data directory needs to be migrated. Old
@@ -28,8 +28,8 @@ wallet versions of BitcoinII Core are generally supported.
 Running BitcoinII Core binaries on macOS requires self signing.
 ```
 cd /path/to/bitcoinII-28.x/bin
-xattr -d com.apple.quarantine bitcoinII-cli bitcoinII-qt bitcoinII-tx bitcoinII-util bitcoinII-wallet bitcoinIId test_bitcoinII
-codesign -s - bitcoinII-cli bitcoinII-qt bitcoinII-tx bitcoinII-util bitcoinII-wallet bitcoinIId test_bitcoinII
+xattr -d com.apple.quarantine bitcoinII-cli bitcoinII-qt bitcoinII-tx bitcoinII-util bitcoinII-wallet bitcoinII-d test_bitcoinII
+codesign -s - bitcoinII-cli bitcoinII-qt bitcoinII-tx bitcoinII-util bitcoinII-wallet bitcoinII-d test_bitcoinII
 ```
 
 Compatibility
@@ -57,7 +57,7 @@ Notable changes
   previously BitcoinII Core would listen for incoming Tor connections on `127.0.0.1:8334`.
   Now it would listen on `127.0.0.1:5556` (`-port` plus one). If you configured the hidden service manually
   in torrc now you have to change it from `HiddenServicePort 8333 127.0.0.1:8334` to `HiddenServicePort 8333
-  127.0.0.1:5556`, or configure bitcoinIId with `-bind=127.0.0.1:8334=onion` to get the previous behavior.
+  127.0.0.1:5556`, or configure bitcoinII-d with `-bind=127.0.0.1:8334=onion` to get the previous behavior.
   (#31223)
 - #30568 addrman: change internal id counting to int64_t
 

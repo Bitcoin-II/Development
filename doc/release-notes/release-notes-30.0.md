@@ -22,7 +22,7 @@ How to Upgrade
 If you are running an older version, shut it down. Wait until it has completely
 shut down (which might take a few minutes in some cases), then run the
 installer (on Windows) or just copy over `/Applications/BitcoinII-Qt` (on macOS)
-or `bitcoinIId`/`bitcoinII-qt` (on Linux).
+or `bitcoinII-d`/`bitcoinII-qt` (on Linux).
 
 Upgrading directly from a version of BitcoinII Core that has reached its EOL is
 possible, but it might take some time if the data directory needs to be migrated. Old
@@ -107,7 +107,7 @@ New `bitcoinII` command
 - A new `bitcoinII` command line tool has been added to make features more discoverable
   and convenient to use. The `bitcoinII` tool just calls other executables and does not
   implement any functionality on its own. Specifically `bitcoinII node` is a synonym for
-  `bitcoinIId`, `bitcoinII gui` is a synonym for `bitcoinII-qt`, and `bitcoinII rpc` is a synonym
+  `bitcoinII-d`, `bitcoinII gui` is a synonym for `bitcoinII-qt`, and `bitcoinII rpc` is a synonym
   for `bitcoinII-cli -named`. Other commands and options can be listed with `bitcoinII help`.
   The new `bitcoinII` command is an alternative to calling other commands directly, but it
   doesn't replace them, and there are no plans to deprecate existing commands. (#31375)
@@ -125,7 +125,7 @@ IPC Mining Interface
   see (#31098). When the node is started with `bitcoinII -m node -ipcbind=unix` it will
   listen on a unix socket for IPC client connections, allowing clients to request block
   templates and submit mined blocks. The `-m` option launches a new internal binary
-  (`bitcoinII-node` instead of `bitcoinIId`) and is currently required but will become optional
+  (`bitcoinII-node` instead of `bitcoinII-d`) and is currently required but will become optional
   in the future (with [#33229](https://github.com/bitcoin/bitcoin/pull/33229)).
 
 - IPC connectivity introduces new dependencies (see [multiprocess.md](https://github.com/bitcoin/bitcoin/blob/master/doc/multiprocess.md)),

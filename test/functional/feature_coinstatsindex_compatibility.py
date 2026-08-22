@@ -20,12 +20,7 @@ class CoinStatsIndexTest(BitcoinIITestFramework):
         self.extra_args = [["-coinstatsindex"],["-coinstatsindex"]]
 
     def skip_test_if_missing_module(self):
-        self.skip_if_no_previous_releases()
-        raise SkipTest(
-            "Not applicable to BitcoinII: RocksDB and the BitcoinII "
-            "on-disk block/index storage format are intentionally incompatible "
-            "with historical BitcoinII Core coinstatsindex database files."
-        )
+        raise SkipTest("Bitcoin Core previous-release binaries are not valid compatibility fixtures for BitcoinII")
 
     def setup_nodes(self):
         self.add_nodes(

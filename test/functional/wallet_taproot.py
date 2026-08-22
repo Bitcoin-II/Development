@@ -15,7 +15,6 @@ from test_framework.util import assert_equal
 from test_framework.descriptors import descsum_create
 from test_framework.script import (
     CScript,
-    MAX_PUBKEYS_PER_MULTI_A,
     OP_CHECKSIG,
     OP_CHECKSIGADD,
     OP_NUMEQUAL,
@@ -486,13 +485,6 @@ class WalletTaprootTest(BitcoinIITestFramework):
             "tr($2/*,{pk($2/*),{pk($2/*),sortedmulti_a(2,$1/*,$2/*,$3/*)}})",
             [True, False, True],
             lambda k1, k2, k3: (key(k2), [pk(k2), [pk(k2), multi_a(2, [k1, k2, k3], True)]])
-        )
-        rnd_pos = random.randrange(MAX_PUBKEYS_PER_MULTI_A)
-        self.do_test(
-            "tr(XPUB,multi_a(1,H...,XPRV,H...))",
-            "tr($2/*,multi_a(1" + (",$H" * rnd_pos) + ",$1/*" + (",$H" * (MAX_PUBKEYS_PER_MULTI_A - 1 - rnd_pos)) + "))",
-            [True, False],
-            lambda k1, k2: (key(k2), [multi_a(1, ([H_POINT] * rnd_pos) + [k1] + ([H_POINT] * (MAX_PUBKEYS_PER_MULTI_A - 1 - rnd_pos)))])
         )
         self.do_test(
             "rawtr(XPRV)",

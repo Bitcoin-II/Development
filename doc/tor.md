@@ -84,9 +84,9 @@ with the prefix `unix:` (e.g. `-onion=unix:/home/me/torsocket`).
 
 In a typical situation, this suffices to run behind a Tor proxy:
 
-    bitcoinIId -proxy=127.0.0.1:9050
+    bitcoinII-d -proxy=127.0.0.1:9050
 
-`bitcoinII node` or `bitcoinII gui` can also be substituted for `bitcoinIId`.
+`bitcoinII node` or `bitcoinII gui` can also be substituted for `bitcoinII-d`.
 
 ## 2. Automatically create a BitcoinII Core onion service
 
@@ -101,7 +101,7 @@ it requires a Tor connection to work. It can be explicitly disabled with
 `-listenonion=0`. If it is not disabled, it can be configured using the
 `-torcontrol` and `-torpassword` settings.
 
-To see verbose Tor information in the bitcoinIId debug log, pass `-debug=tor`.
+To see verbose Tor information in the bitcoinII-d debug log, pass `-debug=tor`.
 
 ### Control Port
 
@@ -123,20 +123,20 @@ Debian and Ubuntu, or just restart the computer).
 ### Authentication
 
 Connecting to Tor's control socket API requires one of two authentication
-methods to be configured: cookie authentication or bitcoinIId's `-torpassword`
+methods to be configured: cookie authentication or bitcoinII-d's `-torpassword`
 configuration option.
 
 #### Cookie authentication
 
-For cookie authentication, the user running bitcoinIId must have read access to
+For cookie authentication, the user running bitcoinII-d must have read access to
 the `CookieAuthFile` specified in the Tor configuration. In some cases this is
 preconfigured and the creation of an onion service is automatic. Don't forget to
-use the `-debug=tor` bitcoinIId configuration option to enable Tor debug logging.
+use the `-debug=tor` bitcoinII-d configuration option to enable Tor debug logging.
 
 If a permissions problem is seen in the debug log, e.g. `tor: Authentication
 cookie /run/tor/control.authcookie could not be opened (check permissions)`, it
 can be resolved by adding both the user running Tor and the user running
-bitcoinIId to the same Tor group and setting permissions appropriately.
+bitcoinII-d to the same Tor group and setting permissions appropriately.
 
 On Debian-derived systems, the Tor group will likely be `debian-tor` and one way
 to verify could be to list the groups and grep for a "tor" group name:
@@ -153,14 +153,14 @@ TORGROUP=$(stat -c '%G' /run/tor/control.authcookie)
 ```
 
 Once you have determined the `${TORGROUP}` and selected the `${USER}` that will
-run bitcoinIId, run this as root:
+run bitcoinII-d, run this as root:
 
 ```
 usermod -a -G ${TORGROUP} ${USER}
 ```
 
 Then restart the computer (or log out) and log in as the `${USER}` that will run
-bitcoinIId.
+bitcoinII-d.
 
 #### `torpassword` authentication
 
@@ -183,7 +183,7 @@ Add these lines to your `/etc/tor/torrc` (or equivalent config file):
     HiddenServicePort 8333 127.0.0.1:8334
 
 The directory can be different of course, but virtual port numbers should be equal to
-your bitcoinIId's P2P listen port (8333 by default), and target addresses and ports
+your bitcoinII-d's P2P listen port (8333 by default), and target addresses and ports
 should be equal to binding address and port for inbound Tor connections (127.0.0.1:8334 by default).
 
     -externalip=X   You can tell bitcoinII about its publicly reachable addresses using
@@ -211,25 +211,25 @@ should be equal to binding address and port for inbound Tor connections (127.0.0
 
 In a typical situation, where you're only reachable via Tor, this should suffice:
 
-    bitcoinIId -proxy=127.0.0.1:9050 -externalip=7zvj7a2imdgkdbg4f2dryd5rgtrn7upivr5eeij4cicjh65pooxeshid.onion -listen
+    bitcoinII-d -proxy=127.0.0.1:9050 -externalip=7zvj7a2imdgkdbg4f2dryd5rgtrn7upivr5eeij4cicjh65pooxeshid.onion -listen
 
 (obviously, replace the .onion address with your own). It should be noted that you still
 listen on all devices and another node could establish a clearnet connection, when knowing
 your address. To mitigate this, additionally bind the address of your Tor proxy:
 
-    bitcoinIId ... -bind=127.0.0.1:8334=onion
+    bitcoinII-d ... -bind=127.0.0.1:8334=onion
 
 If you don't care too much about hiding your node, and want to be reachable on IPv4
 as well, use `discover` instead:
 
-    bitcoinIId ... -discover
+    bitcoinII-d ... -discover
 
 and open port 8333 on your firewall (or use port mapping, i.e., `-natpmp`).
 
 If you only want to use Tor to reach .onion addresses, but not use it as a proxy
 for normal IPv4/IPv6 communication, use:
 
-    bitcoinIId -onion=127.0.0.1:9050 -externalip=7zvj7a2imdgkdbg4f2dryd5rgtrn7upivr5eeij4cicjh65pooxeshid.onion -discover
+    bitcoinII-d -onion=127.0.0.1:9050 -externalip=7zvj7a2imdgkdbg4f2dryd5rgtrn7upivr5eeij4cicjh65pooxeshid.onion -discover
 
 ## 4. Privacy recommendations
 

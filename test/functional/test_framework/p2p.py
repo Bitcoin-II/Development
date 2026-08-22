@@ -4,9 +4,9 @@
 # Copyright (c) 2010-present The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
-"""Test objects for interacting with a bitcoinIId node over the p2p protocol.
+"""Test objects for interacting with a bitcoinII-d node over the p2p protocol.
 
-The P2PInterface objects interact with the bitcoinIId nodes under test using the
+The P2PInterface objects interact with the bitcoinII-d nodes under test using the
 node's p2p interface. They can be used to send messages to the node, and
 callbacks can be registered that execute when messages are received from the
 node. Messages are sent to/received from the node on an asyncio event loop.
@@ -684,8 +684,8 @@ class P2PInterface(P2PConnection):
             raise NotImplementedError("wait_for_inv() will only verify the first inv object")
 
         def test_function():
-            return self.last_message.get("inv") and \
-                                self.last_message["inv"].inv[0].type == expected_inv[0].type and \
+            return self.last_message.get("inv") and\
+                                self.last_message["inv"].inv[0].type == expected_inv[0].type and\
                                 self.last_message["inv"].inv[0].hash == expected_inv[0].hash
 
         self.wait_until(test_function, timeout=timeout)

@@ -2,11 +2,10 @@
 # Copyright (c) 2023-present The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
-"""Test running bitcoinIId with -reindex from a read-only blockstore
+"""Test running bitcoinII-d with -reindex from a read-only blockstore
 - Start a node, generate blocks, then restart with -reindex after setting blk files to read-only
 """
 
-import hashlib
 import os
 import stat
 import subprocess
@@ -20,19 +19,10 @@ class BlockstoreReindexTest(BitcoinIITestFramework):
         self.extra_args = [["-fastprune"]]
 
     def reindex_readonly(self):
-        self.log.debug("Generate block big enough to start second block file")
-        fastprune_blockfile_size = 0x10000
-        opreturn = "6a"
-
-        # The upstream fixture uses repeated 0xff bytes, which compress extremely
-        # well in BitcoinII and therefore never fill the physical block file.
-        # Use deterministic incompressible bytes of exactly the same size so the
-        # test continues to exercise fastprune block-file rollover.
-        nulldata = hashlib.shake_256(
-            b"feature-reindex-readonly"
-        ).digest(fastprune_blockfile_size).hex()
-
-        self.generateblock(self.nodes[0], output=f"raw({opreturn}{nulldata})", transactions=[])
+        self.log.debug("Generate enough blocks to start second block file")
+        # Generate enough ordinary BitcoinII-valid blocks to roll over the
+        # 64 KiB fastprune block file without relying on oversized OP_RETURN data.
+        self.generate(self.nodes[0], 400)
         block_count = self.nodes[0].getblockcount()
         self.stop_node(0)
 

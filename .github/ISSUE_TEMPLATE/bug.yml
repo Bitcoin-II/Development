@@ -70,7 +70,7 @@ body:
     id: core-version
     attributes:
       label: What version of BitcoinII Core are you using?
-      description: Run `bitcoinIId --version` or in BitcoinII-QT use `Help > About BitcoinII Core`
+      description: Run `bitcoinII-d --version` or in BitcoinII-QT use `Help > About BitcoinII Core`
       placeholder: e.g. v24.0.1 or master@e1bf547
     validations:
       required: true

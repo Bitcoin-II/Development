@@ -16,7 +16,7 @@ The following are some helpful notes on how to run BitcoinII Core on your native
 Unpack the files into a directory and run:
 
 - `bin/bitcoinII-qt` (GUI) or
-- `bin/bitcoinIId` (headless)
+- `bin/bitcoinII-d` (headless)
 - `bin/bitcoinII` (wrapper command)
 
 The `bitcoinII` command supports subcommands like `bitcoinII gui`, `bitcoinII node`, and `bitcoinII rpc` exposing different functionality. Subcommands can be listed with `bitcoinII help`.

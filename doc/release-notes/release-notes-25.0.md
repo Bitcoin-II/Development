@@ -22,7 +22,7 @@ How to Upgrade
 If you are running an older version, shut it down. Wait until it has completely
 shut down (which might take a few minutes in some cases), then run the
 installer (on Windows) or just copy over `/Applications/BitcoinII-Qt` (on macOS)
-or `bitcoinIId`/`bitcoinII-qt` (on Linux).
+or `bitcoinII-d`/`bitcoinII-qt` (on Linux).
 
 Upgrading directly from a version of BitcoinII Core that has reached its EOL is
 possible, but it might take some time if the data directory needs to be migrated. Old
@@ -182,7 +182,7 @@ added to the following RPCs in #25375:
   returns a JSON array of strings to better handle multiple warning messages and
   for consistency with other wallet RPCs. The "warning" field will be fully
   removed from these RPCs in v26. It can be temporarily re-enabled during the
-  deprecation period by launching bitcoinIId with the configuration option
+  deprecation period by launching bitcoinII-d with the configuration option
   `-deprecatedrpc=walletwarningfield`. (#27279)
 
 - Descriptor wallets can now spend coins sent to P2WSH Miniscript descriptors. (#24149)

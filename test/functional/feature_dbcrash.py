@@ -89,13 +89,13 @@ class ChainstateWriteCrashTest(BitcoinIITestFramework):
                 return utxo_hash
             except Exception:
                 # An exception here should mean the node is about to crash.
-                # If bitcoinIId exits, then try again.  wait_for_node_exit()
-                # should raise an exception if bitcoinIId doesn't exit.
+                # If bitcoinII-d exits, then try again.  wait_for_node_exit()
+                # should raise an exception if bitcoinII-d doesn't exit.
                 self.wait_for_node_exit(node_index, timeout=10)
             self.crashed_on_restart += 1
 
-        # If we got here, bitcoinIId isn't coming back up on restart.  Could be a
-        # bug in bitcoinIId, or we've gotten unlucky with our dbcrash ratio --
+        # If we got here, bitcoinII-d isn't coming back up on restart.  Could be a
+        # bug in bitcoinII-d, or we've gotten unlucky with our dbcrash ratio --
         # perhaps we generated a test case that blew up our cache?
         # If this happens, the test should try to restart without -dbcrashratio
         # and make sure that recovery happens.

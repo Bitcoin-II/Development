@@ -102,7 +102,7 @@ target_link_libraries(bitcoinIIkernel
   PRIVATE
     core_interface
     kernel_warn_interface
-    bitcoinII_rocksdb
+    leveldb
     secp256k1_objs
     $<$<PLATFORM_ID:Windows>:bcrypt>
     $<TARGET_NAME_IF_EXISTS:USDT::headers>

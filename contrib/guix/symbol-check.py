@@ -91,7 +91,7 @@ ELF_ABIS: dict[lief.ELF.ARCH, dict[lief.Header.ENDIANNESS, list[int]]] = {
 
 # Allowed NEEDED libraries
 ELF_ALLOWED_LIBRARIES = {
-# bitcoinIId and bitcoinII-qt
+# bitcoinII-d and bitcoinII-qt
 'libc.so.6', # C library
 'libpthread.so.0', # threading
 'libm.so.6', # math library
@@ -109,7 +109,7 @@ ELF_ALLOWED_LIBRARIES = {
 }
 
 MACHO_ALLOWED_LIBRARIES = {
-# bitcoinIId and bitcoinII-qt
+# bitcoinII-d and bitcoinII-qt
 'libc++.1.dylib', # C++ Standard Library
 'libSystem.B.dylib', # libc, libm, libpthread, libinfo
 # bitcoinII-qt only

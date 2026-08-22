@@ -1228,7 +1228,7 @@ public:
     void LoadExternalBlockFile(
         AutoFile& file_in,
         FlatFilePos* dbp = nullptr,
-        std::multimap<uint256, std::pair<FlatFilePos, uint32_t>>*
+        std::multimap<uint256, FlatFilePos>*
             blocks_with_unknown_parent = nullptr);
 
     /**

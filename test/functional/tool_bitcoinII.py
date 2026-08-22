@@ -24,7 +24,7 @@ class ToolBitcoinIITest(BitcoinIITestFramework):
     def skip_test_if_missing_module(self):
         # Skip test on windows because currently when `bitcoinII node -version` is
         # run on windows, python doesn't capture output from the child
-        # `bitcoinIId` and `bitcoinII-node` process started with _wexecvp, and
+        # `bitcoinII-d` and `bitcoinII-node` process started with _wexecvp, and
         # stdout/stderr are always empty. See
         # https://github.com/bitcoin/bitcoin/pull/33229#issuecomment-3265524908
         if platform.system() == "Windows":
@@ -62,11 +62,11 @@ class ToolBitcoinIITest(BitcoinIITestFramework):
     def run_test(self):
         node = self.nodes[0]
 
-        self.log.info("Ensure bitcoinII node command invokes bitcoinIId by default")
-        self.test_args([], [], expect_exe="bitcoinIId")
+        self.log.info("Ensure bitcoinII node command invokes bitcoinII-d by default")
+        self.test_args([], [], expect_exe="bitcoinII-d")
 
-        self.log.info("Ensure bitcoinII -M invokes bitcoinIId")
-        self.test_args(["-M"], [], expect_exe="bitcoinIId")
+        self.log.info("Ensure bitcoinII -M invokes bitcoinII-d")
+        self.test_args(["-M"], [], expect_exe="bitcoinII-d")
 
         self.log.info("Ensure bitcoinII -M does not accept -ipcbind")
         self.test_args(["-M"], ["-ipcbind=unix"], expect_error='Error: Error parsing command line arguments: Invalid parameter -ipcbind=unix')

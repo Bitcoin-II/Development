@@ -190,7 +190,7 @@ static const std::map<std::string, BCLog::LogFlags, std::less<>> LOG_CATEGORIES_
     {"libevent", BCLog::LIBEVENT},
     {"coindb", BCLog::COINDB},
     {"qt", BCLog::QT},
-    {"rocksdb", BCLog::ROCKSDB},
+    {"leveldb", BCLog::LEVELDB},
     {"validation", BCLog::VALIDATION},
     {"i2p", BCLog::I2P},
     {"ipc", BCLog::IPC},

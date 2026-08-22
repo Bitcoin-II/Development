@@ -1,7 +1,7 @@
 BitcoinII version 0.7.0 is now available for download at:
   http://sourceforge.net/projects/bitcoin/files/Bitcoin/bitcoin-0.7.0/
 
-We recommend that everybody running prior versions of bitcoinIId/BitcoinII-Qt
+We recommend that everybody running prior versions of bitcoinII-d/BitcoinII-Qt
 upgrade to this release, except for users running Mac OSX 10.5.
 
 Please report bugs using the issue tracker at github:
@@ -30,7 +30,7 @@ Code:
 /Applications/BitcoinII-Qt
 (on Mac) or
 Code:
-bitcoinIId/bitcoinII-qt
+bitcoinII-d/bitcoinII-qt
 (on Linux).
 
 If you were running on Linux with a version that might have been compiled
@@ -131,7 +131,7 @@ Internal codebase
 Miscellaneous
 
 * Reopen debug.log upon SIGHUP
-* Bash programmable completion for bitcoinIId(1)
+* Bash programmable completion for bitcoinII-d(1)
 * On supported OS's, each thread is given a useful name
 
 

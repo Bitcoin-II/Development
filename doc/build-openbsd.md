@@ -2,7 +2,7 @@
 
 **Updated for OpenBSD [7.8](https://www.openbsd.org/78.html)**
 
-This guide describes how to build bitcoinIId, command-line utilities, and GUI on OpenBSD.
+This guide describes how to build bitcoinII-d, command-line utilities, and GUI on OpenBSD.
 
 ## Preparation
 

@@ -2,7 +2,7 @@
 # Copyright (c) 2014-present The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
-"""Test running bitcoinIId with -reindex and -reindex-chainstate options.
+"""Test running bitcoinII-d with -reindex and -reindex-chainstate options.
 
 - Start a single node and generate 3 blocks.
 - Stop the node and restart it with -reindex. Verify that the node has reindexed up to block 3.
@@ -92,7 +92,7 @@ class ReindexTest(BitcoinIITestFramework):
 
         # Start node without the reindex flag and verify it does not wipe the indexes data again
         db_path = node.chain_path / 'indexes' / 'blockfilter' / 'basic' / 'db'
-        with node.assert_debug_log(expected_msgs=[f'Opening RocksDB in {db_path}'], unexpected_msgs=[f'Wiping RocksDB in {db_path}']):
+        with node.assert_debug_log(expected_msgs=[f'Opening LevelDB in {db_path}'], unexpected_msgs=[f'Wiping LevelDB in {db_path}']):
             node.start(['-blockfilterindex'])
             node.wait_for_rpc_connection(wait_for_import=False)
         node.stop_node()

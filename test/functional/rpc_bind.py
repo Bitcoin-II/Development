@@ -2,7 +2,7 @@
 # Copyright (c) 2014-present The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
-"""Test running bitcoinIId with the -rpcbind and -rpcallowip options."""
+"""Test running bitcoinII-d with the -rpcbind and -rpcallowip options."""
 
 from test_framework.netutil import all_interfaces, addr_to_hex, get_bind_addrs, test_ipv6_local
 from test_framework.test_framework import BitcoinIITestFramework, SkipTest
@@ -65,9 +65,9 @@ class RPCBindTest(BitcoinIITestFramework):
         at a non-localhost IP.
         '''
         self.log.info("Allow IP test for %s:%d" % (rpchost, rpcport))
-        node_args = \
-            ['-disablewallet', '-nolisten'] + \
-            ['-rpcallowip='+x for x in allow_ips] + \
+        node_args =\
+            ['-disablewallet', '-nolisten'] +\
+            ['-rpcallowip='+x for x in allow_ips] +\
             ['-rpcbind='+addr for addr in ['127.0.0.1', "%s:%d" % (rpchost, rpcport)]] # Bind to localhost as well so start_nodes doesn't hang
         self.nodes[0].rpchost = None
         self.start_nodes([node_args])

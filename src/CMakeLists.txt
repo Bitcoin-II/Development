@@ -16,7 +16,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 # are set, so output locations of subproject tests and libraries are
 # not overridden.
 include(../cmake/crc32c.cmake)
-include(../cmake/rocksdb.cmake)
+include(../cmake/leveldb.cmake)
 include(../cmake/minisketch.cmake)
 add_subdirectory(univalue)
 if (ENABLE_IPC AND NOT WITH_EXTERNAL_LIBMULTIPROCESS)
@@ -173,7 +173,7 @@ if(ENABLE_WALLET)
 endif()
 
 
-# P2P and RPC server functionality used by `bitcoinIId` and `bitcoinII-qt` executables.
+# P2P and RPC server functionality used by `bitcoinII-d` and `bitcoinII-qt` executables.
 add_library(bitcoinII_node STATIC EXCLUDE_FROM_ALL
   addrdb.cpp
   addrman.cpp
@@ -278,7 +278,7 @@ target_link_libraries(bitcoinII_node
     bitcoinII_common
     bitcoinII_util
     $<TARGET_NAME_IF_EXISTS:bitcoinII_zmq>
-    bitcoinII_rocksdb
+    leveldb
     minisketch
     univalue
     Boost::headers
@@ -304,24 +304,24 @@ if(BUILD_BITCOINII_BIN)
   install_binary_component(bitcoinII HAS_MANPAGE)
 endif()
 
-# BitcoinII Core bitcoinIId.
+# BitcoinII Core bitcoinII-d.
 if(BUILD_DAEMON)
-  add_executable(bitcoinIId
-    bitcoinIId.cpp
-    init/bitcoinIId.cpp
+  add_executable(bitcoinII-d
+    bitcoinII-d.cpp
+    init/bitcoinII-d.cpp
   )
-  add_windows_resources(bitcoinIId bitcoinIId-res.rc)
-  add_windows_application_manifest(bitcoinIId)
-  target_link_libraries(bitcoinIId
+  add_windows_resources(bitcoinII-d bitcoinII-d-res.rc)
+  add_windows_application_manifest(bitcoinII-d)
+  target_link_libraries(bitcoinII-d
     core_interface
     bitcoinII_node
     $<TARGET_NAME_IF_EXISTS:bitcoinII_wallet>
   )
-  install_binary_component(bitcoinIId HAS_MANPAGE)
+  install_binary_component(bitcoinII-d HAS_MANPAGE)
 endif()
 if(ENABLE_IPC AND BUILD_DAEMON)
   add_executable(bitcoinII-node
-    bitcoinIId.cpp
+    bitcoinII-d.cpp
     init/bitcoinII-node.cpp
   )
   target_link_libraries(bitcoinII-node
@@ -443,7 +443,7 @@ endfunction()
 
 # Runtime and command-line executables.
 bitcoinII_set_executable_name(bitcoinII bitcoinII)
-bitcoinII_set_executable_name(bitcoinIId bitcoinII-d)
+bitcoinII_set_executable_name(bitcoinII-d bitcoinII-d)
 bitcoinII_set_executable_name(bitcoinII-node bitcoinII-node)
 bitcoinII_set_executable_name(bitcoinII-qt bitcoinII-qt)
 bitcoinII_set_executable_name(bitcoinII-gui bitcoinII-gui)

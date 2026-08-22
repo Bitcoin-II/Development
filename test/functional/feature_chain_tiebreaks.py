@@ -28,7 +28,7 @@ class ChainTiebreaksTest(BitcoinIITestFramework):
 
     def test_chain_split_in_memory(self):
         node = self.nodes[0]
-        # Add P2P connection to bitcoinIId
+        # Add P2P connection to bitcoinII-d
         peer = node.add_p2p_connection(P2PDataStore())
 
         self.log.info('Precomputing blocks')

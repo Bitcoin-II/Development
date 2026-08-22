@@ -19,7 +19,7 @@ function(setup_split_debug_script)
 endfunction()
 
 function(add_windows_deploy_target)
-  if(MINGW AND TARGET bitcoinII AND TARGET bitcoinII-qt AND TARGET bitcoinIId AND TARGET bitcoinII-cli AND TARGET bitcoinII-tx AND TARGET bitcoinII-wallet AND TARGET bitcoinII-util AND TARGET test_bitcoinII)
+  if(MINGW AND TARGET bitcoinII AND TARGET bitcoinII-qt AND TARGET bitcoinII-d AND TARGET bitcoinII-cli AND TARGET bitcoinII-tx AND TARGET bitcoinII-wallet AND TARGET bitcoinII-util AND TARGET test_bitcoinII)
     find_program(MAKENSIS_EXECUTABLE makensis)
     if(NOT MAKENSIS_EXECUTABLE)
       add_custom_target(deploy
@@ -37,7 +37,7 @@ function(add_windows_deploy_target)
       COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/release
       COMMAND ${CMAKE_STRIP} $<TARGET_FILE:bitcoinII> -o ${PROJECT_BINARY_DIR}/release/$<TARGET_FILE_NAME:bitcoinII>
       COMMAND ${CMAKE_STRIP} $<TARGET_FILE:bitcoinII-qt> -o ${PROJECT_BINARY_DIR}/release/$<TARGET_FILE_NAME:bitcoinII-qt>
-      COMMAND ${CMAKE_STRIP} $<TARGET_FILE:bitcoinIId> -o ${PROJECT_BINARY_DIR}/release/$<TARGET_FILE_NAME:bitcoinIId>
+      COMMAND ${CMAKE_STRIP} $<TARGET_FILE:bitcoinII-d> -o ${PROJECT_BINARY_DIR}/release/$<TARGET_FILE_NAME:bitcoinII-d>
       COMMAND ${CMAKE_STRIP} $<TARGET_FILE:bitcoinII-cli> -o ${PROJECT_BINARY_DIR}/release/$<TARGET_FILE_NAME:bitcoinII-cli>
       COMMAND ${CMAKE_STRIP} $<TARGET_FILE:bitcoinII-tx> -o ${PROJECT_BINARY_DIR}/release/$<TARGET_FILE_NAME:bitcoinII-tx>
       COMMAND ${CMAKE_STRIP} $<TARGET_FILE:bitcoinII-wallet> -o ${PROJECT_BINARY_DIR}/release/$<TARGET_FILE_NAME:bitcoinII-wallet>

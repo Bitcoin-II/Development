@@ -251,7 +251,7 @@ class NetTracepointTest(BitcoinIITestFramework):
 
     def skip_test_if_missing_module(self):
         self.skip_if_platform_not_linux()
-        self.skip_if_no_bitcoinIId_tracepoints()
+        self.skip_if_no_bitcoinII_d_tracepoints()
         self.skip_if_no_python_bcc()
         self.skip_if_no_bpf_permissions()
         self.skip_if_running_under_valgrind()
@@ -323,7 +323,7 @@ class NetTracepointTest(BitcoinIITestFramework):
         bpf["inbound_messages"].open_perf_buffer(handle_inbound)
         bpf["outbound_messages"].open_perf_buffer(handle_outbound)
 
-        self.log.info("connect a P2P test node to our bitcoinIId node")
+        self.log.info("connect a P2P test node to our bitcoinII-d node")
         test_node = P2PInterface()
         self.nodes[0].add_p2p_connection(test_node)
         bpf.perf_buffer_poll(timeout=200)
@@ -359,7 +359,7 @@ class NetTracepointTest(BitcoinIITestFramework):
 
         bpf["inbound_connections"].open_perf_buffer(handle_inbound_connection)
 
-        self.log.info("connect two P2P test nodes to our bitcoinIId node")
+        self.log.info("connect two P2P test nodes to our bitcoinII-d node")
         testnodes = list()
         for _ in range(EXPECTED_INBOUND_CONNECTIONS):
             testnode = P2PInterface()
@@ -399,7 +399,7 @@ class NetTracepointTest(BitcoinIITestFramework):
             handle_outbound_connection)
 
         self.log.info(
-            f"connect {EXPECTED_OUTBOUND_CONNECTIONS} P2P test nodes to our bitcoinIId node")
+            f"connect {EXPECTED_OUTBOUND_CONNECTIONS} P2P test nodes to our bitcoinII-d node")
         testnodes = list()
         for p2p_idx in range(EXPECTED_OUTBOUND_CONNECTIONS):
             testnode = P2PInterface()
@@ -437,7 +437,7 @@ class NetTracepointTest(BitcoinIITestFramework):
         bpf["evicted_inbound_connections"].open_perf_buffer(handle_evicted_inbound_connection)
 
         self.log.info(
-            f"connect {MAX_INBOUND_CONNECTIONS + EXPECTED_EVICTED_CONNECTIONS} P2P test nodes to our bitcoinIId node and expect {EXPECTED_EVICTED_CONNECTIONS} evictions")
+            f"connect {MAX_INBOUND_CONNECTIONS + EXPECTED_EVICTED_CONNECTIONS} P2P test nodes to our bitcoinII-d node and expect {EXPECTED_EVICTED_CONNECTIONS} evictions")
         testnodes = list()
         for p2p_idx in range(MAX_INBOUND_CONNECTIONS + EXPECTED_EVICTED_CONNECTIONS):
             testnode = P2PInterface()
@@ -473,7 +473,7 @@ class NetTracepointTest(BitcoinIITestFramework):
 
         bpf["misbehaving_connections"].open_perf_buffer(handle_misbehaving_connection)
 
-        self.log.info("connect a misbehaving P2P test nodes to our bitcoinIId node")
+        self.log.info("connect a misbehaving P2P test nodes to our bitcoinII-d node")
         msg = msg_headers([CBlockHeader()] * (MAX_HEADERS_RESULTS + 1))
         for _ in range(EXPECTED_MISBEHAVING_CONNECTIONS):
             testnode = P2PInterface()
@@ -508,7 +508,7 @@ class NetTracepointTest(BitcoinIITestFramework):
         bpf["closed_connections"].open_perf_buffer(handle_closed_connection)
 
         self.log.info(
-            f"connect {EXPECTED_CLOSED_CONNECTIONS} P2P test nodes to our bitcoinIId node")
+            f"connect {EXPECTED_CLOSED_CONNECTIONS} P2P test nodes to our bitcoinII-d node")
         testnodes = list()
         for p2p_idx in range(EXPECTED_CLOSED_CONNECTIONS):
             testnode = P2PInterface()

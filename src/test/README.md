@@ -68,7 +68,7 @@ build/bin/test_bitcoinII --run_test=getarg_tests/doubledash
 The `--log_level=` (or `-l`) argument controls the verbosity of the test output.
 
 The `test_bitcoinII` runner also accepts some of the command line arguments accepted by
-`bitcoinIId`. Use `--` to separate these sets of arguments:
+`bitcoinII-d`. Use `--` to separate these sets of arguments:
 
 ```bash
 build/bin/test_bitcoinII --log_level=all --run_test=getarg_tests -- -printtoconsole=1
@@ -82,7 +82,7 @@ Running `test_bitcoinII` creates a temporary working (data) directory with a ran
 generated pathname within `test_common bitcoinII/`, which in turn is within
 the system's temporary directory (see
 [`temp_directory_path`](https://en.cppreference.com/w/cpp/filesystem/temp_directory_path)).
-This data directory looks like a simplified form of the standard `bitcoinIId` data
+This data directory looks like a simplified form of the standard `bitcoinII-d` data
 directory. Its content will vary depending on the test, but it will always
 have a `debug.log` file, for example.
 

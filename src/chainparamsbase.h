@@ -14,7 +14,7 @@
 class ArgsManager;
 
 /**
- * CBaseChainParams defines the base parameters (shared between bitcoinII-cli and bitcoinIId)
+ * CBaseChainParams defines the base parameters (shared between bitcoinII-cli and bitcoinII-d)
  * of a given instance of the BitcoinII system.
  */
 class CBaseChainParams

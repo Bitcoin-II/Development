@@ -81,13 +81,13 @@ The high water mark value must be an integer greater than or equal to 0.
 
 For instance:
 
-    $ bitcoinIId -zmqpubhashtx=tcp://127.0.0.1:28332 \
+    $ bitcoinII-d -zmqpubhashtx=tcp://127.0.0.1:28332 \
                -zmqpubhashtx=tcp://192.168.1.2:28332 \
                -zmqpubhashblock="tcp://[::1]:28333" \
-               -zmqpubrawtx=unix:/tmp/bitcoinIId.tx.raw \
+               -zmqpubrawtx=unix:/tmp/bitcoinII-d.tx.raw \
                -zmqpubhashtxhwm=10000
 
-`bitcoinII node` or `bitcoinII gui` can also be substituted for `bitcoinIId`.
+`bitcoinII node` or `bitcoinII gui` can also be substituted for `bitcoinII-d`.
 
 Notification types correspond to message topics (details in next section). For instance,
 for the notification `-zmqpubhashtx` the topic is `hashtx`. These options can also be
@@ -180,9 +180,9 @@ hosts as well. If needed, this option has to be set on the client side too.
 
 ## Remarks
 
-From the perspective of bitcoinIId, the ZeroMQ socket is write-only; PUB
+From the perspective of bitcoinII-d, the ZeroMQ socket is write-only; PUB
 sockets don't even have a read function. Thus, there is no state
-introduced into bitcoinIId directly. Furthermore, no information is
+introduced into bitcoinII-d directly. Furthermore, no information is
 broadcast that wasn't already received from the public P2P network.
 
 No authentication or authorization is done on connecting clients; it

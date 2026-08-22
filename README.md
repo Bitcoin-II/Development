@@ -26,18 +26,13 @@ BitcoinII Core codebase.
 
 The primary changes in BitcoinII v31.1.1 include:
 
-- Replacement of the LevelDB database backend with RocksDB.
-- Hardware-aware automatic database-cache configuration.
-- Workload-specific RocksDB tuning for chainstate and optional indexes.
-- LZ4 and Zstandard compression within the RocksDB storage backend.
-- Zstandard-compressed `blk*.dat` block records with transparent raw-record
-  compatibility and fallback when compression is not beneficial.
-- Reduced disk usage for blockchain and index storage.
+- LevelDB database and block-storage architecture aligned with Bitcoin Core
+  v31.1.
 - Parallel block-input prevout fetching during block validation, backported
-  from post-v31.1 BitcoinII Core development.
+  from post-v31.1 Bitcoin Core development.
 - Consensus-enforced restrictions on arbitrary blockchain data storage.
-- BitcoinII-specific branding, configuration naming, and application
-  integration.
+- BitcoinII-specific branding, configuration naming, network parameters, and
+  application integration.
 
 Further technical information is available in the [doc folder](doc/).
 
@@ -46,20 +41,13 @@ BitcoinII-Specific Documentation
 
 The following documents describe significant BitcoinII-specific behavior:
 
-- [RocksDB automatic configuration](doc/BitcoinII-RocksDB-AutoConfig-Documentation.md)
-- [BitcoinII v31.1.1 disk storage comparison](doc/BitcoinII-31.1.1-Disk-Storage-Usage-Comparison-Results.md)
 - [Parallel prevout fetching](doc/BitcoinII-Parallel-Prevout-Fetch.md)
 
-RocksDB and Build Dependencies
-------------------------------
+Build Dependencies
+------------------
 
-BitcoinII replaces BitcoinII Core's LevelDB backend with RocksDB and uses LZ4
-and Zstandard as part of its database and block-storage implementation.
-
-Users building BitcoinII from source are strongly encouraged to use the
-BitcoinII Depends system. The source tree specifies the RocksDB, LZ4, and
-Zstandard versions and build configuration against which BitcoinII is
-developed and tested.
+Users building BitcoinII from source are encouraged to use the BitcoinII
+Depends system for reproducible dependency builds.
 
 See the platform-specific build documentation in the [doc folder](doc/) and
 the [depends documentation](depends/README.md) for additional information.
@@ -74,13 +62,8 @@ The primary BitcoinII configuration file is:
 BitcoinII retains the familiar BitcoinII Core configuration model and
 command-line option format while adding BitcoinII-specific functionality.
 
-Database memory is automatically selected according to available system
-resources when `dbcache` is not explicitly configured. Users who prefer a
-manual database-memory budget may continue to set `dbcache` explicitly.
-
-See the
-[RocksDB automatic configuration documentation](doc/BitcoinII-RocksDB-AutoConfig-Documentation.md)
-for details.
+Database cache memory may be configured with the standard `dbcache`
+option.
 
 Development
 -----------

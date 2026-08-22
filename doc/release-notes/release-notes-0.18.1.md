@@ -19,7 +19,7 @@ How to Upgrade
 If you are running an older version, shut it down. Wait until it has
 completely shut down (which might take a few minutes for older
 versions), then run the installer (on Windows) or just copy over
-`/Applications/BitcoinII-Qt` (on Mac) or `bitcoinIId`/`bitcoinII-qt` (on
+`/Applications/BitcoinII-Qt` (on Mac) or `bitcoinII-d`/`bitcoinII-qt` (on
 Linux).
 
 The first time you run version 0.15.0 or newer, your chainstate database

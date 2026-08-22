@@ -311,8 +311,8 @@ If the code is behaving strangely, take a look in the `debug.log` file in the da
 error and debugging messages are written there.
 
 Debug logging can be enabled on startup with the `-debug` and `-loglevel`
-configuration options and toggled while bitcoinIId is running with the `logging`
-RPC.  For instance, launching bitcoinIId with `-debug` or `-debug=1` will turn on
+configuration options and toggled while bitcoinII-d is running with the `logging`
+RPC.  For instance, launching bitcoinII-d with `-debug` or `-debug=1` will turn on
 all log categories and `-loglevel=trace` will turn on all log severity levels.
 
 The Qt code routes `qDebug()` output to `debug.log` under category "qt": run with `-debug=qt`
@@ -346,7 +346,7 @@ The `-DCMAKE_BUILD_TYPE=Debug` build option adds `-DDEBUG_LOCKCONTENTION` to the
 compiler flags. You may also enable it manually by building with `-DDEBUG_LOCKCONTENTION`
 added to your CPPFLAGS, i.e. `-DAPPEND_CPPFLAGS="-DDEBUG_LOCKCONTENTION"`.
 
-You can then use the `-debug=lock` configuration option at bitcoinIId startup or
+You can then use the `-debug=lock` configuration option at bitcoinII-d startup or
 `bitcoinII-cli logging '["lock"]'` at runtime to turn on lock contention logging.
 It can be toggled off again with `bitcoinII-cli logging [] '["lock"]'`.
 
@@ -392,7 +392,7 @@ in-tree. Example use:
 $ valgrind --suppressions=test/sanitizer_suppressions/valgrind.supp build/bin/test_bitcoinII
 $ valgrind --suppressions=test/sanitizer_suppressions/valgrind.supp --leak-check=full \
       --show-leak-kinds=all build/bin/test_bitcoinII --log_level=test_suite
-$ valgrind -v --leak-check=full build/bin/bitcoinIId -printtoconsole
+$ valgrind -v --leak-check=full build/bin/bitcoinII-d -printtoconsole
 $ ./build/test/functional/test_runner.py --valgrind
 ```
 
@@ -469,7 +469,7 @@ Generating the coverage report:
 ```shell
 llvm-cov show \
     --object=build/bin/test_bitcoinII \
-    --object=build/bin/bitcoinIId \
+    --object=build/bin/bitcoinII-d \
     -Xdemangler=llvm-cxxfilt \
     --instr-profile=build/coverage.profdata \
     --ignore-filename-regex="src/crc32c/|src/leveldb/|src/minisketch/|src/secp256k1/|src/test/" \
@@ -566,13 +566,13 @@ Make sure you [understand the security
 trade-offs](https://lwn.net/Articles/420403/) of setting these kernel
 parameters.
 
-To profile a running bitcoinIId process for 60 seconds, you could use an
+To profile a running bitcoinII-d process for 60 seconds, you could use an
 invocation of `perf record` like this:
 
 ```sh
 $ perf record \
     -g --call-graph dwarf --per-thread -F 140 \
-    -p `pgrep bitcoinIId` -- sleep 60
+    -p `pgrep bitcoinII-d` -- sleep 60
 ```
 
 You could then analyze the results by running:
@@ -659,7 +659,7 @@ and its `cs_KeyStore` lock for example).
 ## Threads
 
 - [Main thread (`bitcoind`)](https://doxygen.bitcoincore.org/bitcoind_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97)
-  : Started from `main()` in `bitcoinIId.cpp`. Responsible for starting up and
+  : Started from `main()` in `bitcoinII-d.cpp`. Responsible for starting up and
   shutting down the application.
 
 - [Init load (`b-initload`)](https://doxygen.bitcoincore.org/namespacenode.html#ab4305679079866f0f420f7dbf278381d)
@@ -1147,7 +1147,7 @@ In addition to reviewing the upstream changes in `env_posix.cc`, you can use `ls
 check this. For example, on Linux this command will show open `.ldb` file counts:
 
 ```bash
-$ lsof -p $(pidof bitcoinIId) |\
+$ lsof -p $(pidof bitcoinII-d) |\
     awk 'BEGIN { fd=0; mem=0; } /ldb$/ { if ($4 == "mem") mem++; else fd++ } END { printf "mem = %s, fd = %s\n", mem, fd}'
 mem = 119, fd = 0
 ```

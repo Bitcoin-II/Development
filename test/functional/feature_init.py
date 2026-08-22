@@ -57,7 +57,7 @@ class InitTest(BitcoinIITestFramework):
             if platform.system() == 'Windows':
                 # Don't call Python's terminate() since it calls
                 # TerminateProcess(), which unlike SIGTERM doesn't allow
-                # bitcoinIId to perform any shutdown logic.
+                # bitcoinII-d to perform any shutdown logic.
                 os.kill(node.process.pid, signal.CTRL_BREAK_EVENT)
             else:
                 node.process.terminate()
@@ -121,12 +121,12 @@ class InitTest(BitcoinIITestFramework):
 
         deletion_rounds = [
             {
-                'filepath_glob': 'blocks/index/*.sst',
-                'error_message': r'Error (opening|initializing) block database\.',
+                'filepath_glob': 'blocks/index/*.ldb',
+                'error_message': 'Error opening block database.',
                 'startup_args': [],
             },
             {
-                'filepath_glob': 'chainstate/*.sst',
+                'filepath_glob': 'chainstate/*.ldb',
                 'error_message': 'Error opening coins database.',
                 'startup_args': ['-checklevel=4'],
             },
@@ -137,12 +137,12 @@ class InitTest(BitcoinIITestFramework):
             },
             {
                 'filepath_glob': 'indexes/txindex/MANIFEST*',
-                'error_message': r'Fatal RocksDB error: .*MANIFEST',
+                'error_message': 'LevelDB error: Corruption: CURRENT points to a non-existent file',
                 'startup_args': ['-txindex=1'],
             },
             {
                 'filepath_glob': 'indexes/txospenderindex/db/MANIFEST*',
-                'error_message': r'Fatal RocksDB error: .*MANIFEST',
+                'error_message': 'LevelDB error: Corruption: CURRENT points to a non-existent file',
                 'startup_args': ['-txospenderindex=1'],
             },
             # Removing these files does not result in a startup error:
@@ -152,12 +152,12 @@ class InitTest(BitcoinIITestFramework):
 
         perturbation_rounds = [
             {
-                'filepath_glob': 'blocks/index/*.sst',
-                'error_message': r'Error (opening|initializing) block database\.',
+                'filepath_glob': 'blocks/index/*.ldb',
+                'error_message': 'Error loading block database.',
                 'startup_args': [],
             },
             {
-                'filepath_glob': 'chainstate/*.sst',
+                'filepath_glob': 'chainstate/*.ldb',
                 'error_message': 'Error opening coins database.',
                 'startup_args': [],
             },
@@ -168,27 +168,27 @@ class InitTest(BitcoinIITestFramework):
             },
             {
                 'filepath_glob': 'indexes/blockfilter/basic/db/*.*',
-                'error_message': 'Fatal RocksDB error: Corruption',
+                'error_message': 'LevelDB error: Corruption',
                 'startup_args': ['-blockfilterindex=1'],
             },
             {
                 'filepath_glob': 'indexes/coinstatsindex/db/*.*',
-                'error_message': 'Fatal RocksDB error: Corruption',
+                'error_message': 'LevelDB error: Corruption',
                 'startup_args': ['-coinstatsindex=1'],
             },
             {
                 'filepath_glob': 'indexes/txindex/*.log',
-                'error_message': 'Fatal RocksDB error: Corruption',
+                'error_message': 'LevelDB error: Corruption',
                 'startup_args': ['-txindex=1'],
             },
             {
                 'filepath_glob': 'indexes/txindex/CURRENT',
-                'error_message': 'Fatal RocksDB error: Corruption',
+                'error_message': 'LevelDB error: Corruption',
                 'startup_args': ['-txindex=1'],
             },
             {
                 'filepath_glob': 'indexes/txospenderindex/db/*',
-                'error_message': 'Fatal RocksDB error: Corruption',
+                'error_message': 'LevelDB error: Corruption',
                 'startup_args': ['-txospenderindex=1'],
             },
             # Perturbing these files does not result in a startup error:

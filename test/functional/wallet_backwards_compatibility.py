@@ -19,7 +19,7 @@ import os
 import shutil
 
 from test_framework.blocktools import COINBASE_MATURITY
-from test_framework.test_framework import BitcoinIITestFramework
+from test_framework.test_framework import BitcoinIITestFramework, SkipTest
 from test_framework.descriptors import descsum_create
 from test_framework.messages import ser_string
 
@@ -50,7 +50,7 @@ class BackwardsCompatibilityTest(BitcoinIITestFramework):
 
     def skip_test_if_missing_module(self):
         self.skip_if_no_wallet()
-        self.skip_if_no_previous_releases()
+        raise SkipTest("Bitcoin Core previous-release binaries are not valid compatibility fixtures for BitcoinII")
 
     def setup_nodes(self):
         self.add_nodes(self.num_nodes, extra_args=self.extra_args, versions=[

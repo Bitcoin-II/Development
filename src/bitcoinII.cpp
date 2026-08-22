@@ -23,13 +23,13 @@ static constexpr auto HELP_USAGE = R"(Usage: %s [OPTIONS] COMMAND...
 
 Options:
   -m, --multiprocess     Run multiprocess binaries bitcoinII-node, bitcoinII-gui.
-  -M, --monolithic       Run monolithic binaries bitcoinIId, bitcoinII-qt. (Default behavior)
+  -M, --monolithic       Run monolithic binaries bitcoinII-d, bitcoinII-qt. (Default behavior)
   -v, --version          Show version information
   -h, --help             Show full help message
 
 Commands:
   gui [ARGS]     Start GUI, equivalent to running 'bitcoinII-qt [ARGS]' or 'bitcoinII-gui [ARGS]'.
-  node [ARGS]    Start node, equivalent to running 'bitcoinIId [ARGS]' or 'bitcoinII-node [ARGS]'.
+  node [ARGS]    Start node, equivalent to running 'bitcoinII-d [ARGS]' or 'bitcoinII-node [ARGS]'.
   rpc [ARGS]     Call RPC method, equivalent to running 'bitcoinII-cli -named [ARGS]'.
   wallet [ARGS]  Call wallet command, equivalent to running 'bitcoinII-wallet [ARGS]'.
   tx [ARGS]      Manipulate hex-encoded transactions, equivalent to running 'bitcoinII-tx [ARGS]'.
@@ -171,12 +171,12 @@ bool UseMultiprocess(const CommandLine& cmd)
     return args.IsArgSet("-ipcbind") || args.IsArgSet("-ipcconnect") || args.IsArgSet("-ipcfd");
 }
 
-//! Execute the specified bitcoinIId, bitcoinII-qt or other command line in `args`
+//! Execute the specified bitcoinII-d, bitcoinII-qt or other command line in `args`
 //! using src, bin and libexec directory paths relative to this executable, where
 //! the path to this executable is specified in `wrapper_argv0`.
 //!
 //! @param args Command line arguments to execute, where first argument should
-//!             be a relative path to a bitcoinIId, bitcoinII-qt or other executable
+//!             be a relative path to a bitcoinII-d, bitcoinII-qt or other executable
 //!             that will be located on the PATH or relative to wrapper_argv0.
 //!
 //! @param wrapper_argv0 String containing first command line argument passed to

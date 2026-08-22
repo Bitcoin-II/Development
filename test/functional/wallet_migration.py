@@ -18,7 +18,7 @@ from test_framework.address import (
 )
 from test_framework.descriptors import descsum_create
 from test_framework.key import ECPubKey
-from test_framework.test_framework import BitcoinIITestFramework
+from test_framework.test_framework import BitcoinIITestFramework, SkipTest
 from test_framework.messages import COIN, CTransaction, CTxOut, ser_string
 from test_framework.script import hash160
 from test_framework.script_util import key_to_p2pkh_script, key_to_p2pk_script, script_to_p2sh_script, script_to_p2wsh_script
@@ -46,7 +46,7 @@ class WalletMigrationTest(BitcoinIITestFramework):
 
     def skip_test_if_missing_module(self):
         self.skip_if_no_wallet()
-        self.skip_if_no_previous_releases()
+        raise SkipTest("Bitcoin Core previous-release binaries are not valid compatibility fixtures for BitcoinII")
 
     def setup_nodes(self):
         self.add_nodes(

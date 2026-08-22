@@ -19,7 +19,7 @@ How to Upgrade
 If you are running an older version, shut it down. Wait until it has completely
 shut down (which might take a few minutes in some cases), then run the
 installer (on Windows) or just copy over `/Applications/BitcoinII-Qt` (on macOS)
-or `bitcoinIId`/`bitcoinII-qt` (on Linux).
+or `bitcoinII-d`/`bitcoinII-qt` (on Linux).
 
 Upgrading directly from a version of BitcoinII Core that has reached its EOL is
 possible, but it might take some time if the data directory needs to be migrated. Old
@@ -152,7 +152,7 @@ function signature instead of just the function name. (#32604)
 - #32353 doc: Fix fuzz test_runner.py path
 - #32389 doc: Fix test_bitcoinII path
 - #32607 rpc: Note in fundrawtransaction doc, fee rate is for package
-- #32679 doc: update tor docs to use bitcoinIId binary from path
+- #32679 doc: update tor docs to use bitcoinII-d binary from path
 - #32693 depends: fix cmake compatibility error for freetype
 - #32696 doc: make -DWITH_ZMQ=ON explicit on build-unix.md
 - #32708 rpc, doc: update listdescriptors RCP help

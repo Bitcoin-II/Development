@@ -22,8 +22,8 @@
 
 #include <cassert>
 #include <cstdint>
+#include <cstdio>
 #include <exception>
-#include <ios>
 #include <span>
 #include <string>
 #include <utility>
@@ -49,13 +49,7 @@ public:
 };
 
 TxIndex::DB::DB(size_t n_cache_size, bool f_memory, bool f_wipe) :
-    BaseIndex::DB(
-        gArgs.GetDataDirNet() / "indexes" / "txindex",
-        n_cache_size,
-        f_memory,
-        f_wipe,
-        /*f_obfuscate=*/false,
-        DBProfile::TX_INDEX)
+    BaseIndex::DB(gArgs.GetDataDirNet() / "indexes" / "txindex", n_cache_size, f_memory, f_wipe)
 {}
 
 bool TxIndex::DB::ReadTxPos(const Txid& txid, CDiskTxPos& pos) const
@@ -104,45 +98,24 @@ bool TxIndex::FindTx(const Txid& tx_hash, uint256& block_hash, CTransactionRef& 
         return false;
     }
 
-    const auto block_data{m_chainstate->m_blockman.ReadRawBlock(postx)};
-    if (!block_data) {
-        LogError("ReadRawBlock failed while reading txindex entry");
+    AutoFile file{m_chainstate->m_blockman.OpenBlockFile(postx, true)};
+    if (file.IsNull()) {
+        LogError("OpenBlockFile failed");
         return false;
     }
-
-    const std::span<const std::byte> raw{
-        block_data->data(),
-        block_data->size()
-    };
-
     CBlockHeader header;
-
     try {
-        SpanReader{raw} >> header;
-
-        const uint64_t transaction_position{
-            GetSerializeSize(header) +
-            static_cast<uint64_t>(postx.nTxOffset)
-        };
-
-        if (transaction_position >= static_cast<uint64_t>(raw.size())) {
-           throw std::ios_base::failure{
-               "txindex offset exceeds decompressed block size"
-           };
-        }
-
-        SpanReader{raw.subspan(static_cast<size_t>(transaction_position))} >>
-            TX_WITH_WITNESS(tx);
+        file >> header;
+        file.seek(postx.nTxOffset, SEEK_CUR);
+        file >> TX_WITH_WITNESS(tx);
     } catch (const std::exception& e) {
         LogError("Deserialize or I/O error - %s", e.what());
         return false;
     }
-
     if (tx->GetHash() != tx_hash) {
         LogError("txid mismatch");
         return false;
     }
-
     block_hash = header.GetHash();
     return true;
 }

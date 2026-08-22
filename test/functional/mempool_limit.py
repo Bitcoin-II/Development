@@ -68,7 +68,7 @@ class MempoolLimitTest(BitcoinIITestFramework):
         num_big_parents = 3
         # Need to be large enough to trigger eviction
         # (note that the mempool usage of a tx is about three times its vsize)
-        assert_greater_than(parent_vsize * num_big_parents * 3, current_info["maxmempool"] - current_info["bytes"])
+        assert_greater_than(parent_vsize * num_big_parents * 3, current_info["maxmempool"] - current_info["usage"])
 
         big_parent_txids = []
         big_parent_wtxids = []
@@ -259,7 +259,7 @@ class MempoolLimitTest(BitcoinIITestFramework):
         # Needs to be large enough to trigger eviction
         # (note that the mempool usage of a tx is about three times its vsize)
         target_vsize_each = 50000
-        assert_greater_than(target_vsize_each * 2 * 3, node.getmempoolinfo()["maxmempool"] - node.getmempoolinfo()["bytes"])
+        assert_greater_than(target_vsize_each * 2 * 3, node.getmempoolinfo()["maxmempool"] - node.getmempoolinfo()["usage"])
         # Should be a true CPFP: parent's feerate is just below mempool min feerate
         parent_feerate = mempoolmin_feerate - Decimal("0.0000001")  # 0.01 sat2s/vbyte below min feerate
         # Parent + child is above mempool minimum feerate

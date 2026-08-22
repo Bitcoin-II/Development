@@ -8,7 +8,7 @@
 #
 
 from test_framework.blocktools import COINBASE_MATURITY
-from test_framework.test_framework import BitcoinIITestFramework
+from test_framework.test_framework import BitcoinIITestFramework, SkipTest
 from test_framework.util import (
     assert_equal,
     assert_raises_rpc_error,
@@ -36,6 +36,9 @@ class GetblockstatsTest(BitcoinIITestFramework):
     def set_test_params(self):
         self.num_nodes = 1
         self.setup_clean_chain = True
+
+    def skip_test_if_missing_module(self):
+        raise SkipTest("Bitcoin Core pregenerated getblockstats fixtures are not valid for BitcoinII")
 
     def get_stats(self):
         return [self.nodes[0].getblockstats(hash_or_height=self.start_height + i) for i in range(self.max_stat_pos+1)]
@@ -169,7 +172,7 @@ class GetblockstatsTest(BitcoinIITestFramework):
 
         self.log.info('Test block height 0')
         genesis_stats = self.nodes[0].getblockstats(0)
-        assert_equal(genesis_stats["blockhash"], "0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206")
+        assert_equal(genesis_stats["blockhash"], "5ac3b379cfa0600d059b007cb2b6b1b293832f6e398af62ec4e009b369e532b6")
         assert_equal(genesis_stats["utxo_increase"], 1)
         assert_equal(genesis_stats["utxo_size_inc"], 117)
         assert_equal(genesis_stats["utxo_increase_actual"], 0)

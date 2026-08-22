@@ -263,8 +263,8 @@ class Binaries:
         ] if use_valgrind else []
 
     def node_argv(self, **kwargs):
-        "Return argv array that should be used to invoke bitcoinIId"
-        return self._argv("node", self.paths.bitcoinIId, **kwargs)
+        "Return argv array that should be used to invoke bitcoinII-d"
+        return self._argv("node", self.paths.bitcoinII_d, **kwargs)
 
     def rpc_argv(self):
         "Return argv array that should be used to invoke bitcoinII-cli"
@@ -295,7 +295,7 @@ class Binaries:
         """Return argv array that should be used to invoke the command.
 
         It either uses the bitcoinII wrapper executable (if BITCOINII_CMD is set or
-        need_ipc is True), or the direct binary path (bitcoinIId, etc). When
+        need_ipc is True), or the direct binary path (bitcoinII-d, etc). When
         bin_dir is set (by tests calling binaries from previous releases) it
         always uses the direct path.
 
@@ -307,7 +307,7 @@ class Binaries:
             # Previous-release compatibility tests use upstream BitcoinII Core
             # binaries, whose executable names differ from BitcoinII.
             previous_release_binaries = {
-                "node": "bitcoinIId",
+                "node": "bitcoinII-d",
                 "rpc": "bitcoinII-cli",
                 "bench": "bench_bitcoinII",
                 "tx": "bitcoinII-tx",
@@ -347,7 +347,11 @@ def get_binary_paths(config):
             "bin",
             binary + config["environment"]["EXEEXT"],
         )
-        attribute_name = env_variable_name.lower().replace("bitcoinii", "bitcoinII", 1)
+        attribute_name = (
+            "bitcoinII_d"
+            if binary == "bitcoinII-d"
+            else env_variable_name.lower().replace("bitcoinii", "bitcoinII", 1)
+        )
         setattr(paths, attribute_name, os.getenv(env_variable_name, default=default_filename))
     # BITCOINII_CMD environment variable can be specified to invoke bitcoinII
     # wrapper binary instead of other executables.

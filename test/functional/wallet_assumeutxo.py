@@ -7,7 +7,7 @@ See feature_assumeutxo.py for background.
 """
 from test_framework.address import address_to_scriptpubkey
 from test_framework.descriptors import descsum_create
-from test_framework.test_framework import BitcoinIITestFramework
+from test_framework.test_framework import BitcoinIITestFramework, SkipTest
 from test_framework.messages import COIN
 from test_framework.util import (
     assert_equal,
@@ -27,6 +27,7 @@ FINAL_HEIGHT = 399
 class AssumeutxoTest(BitcoinIITestFramework):
     def skip_test_if_missing_module(self):
         self.skip_if_no_wallet()
+        raise SkipTest("BitcoinII AssumeUTXO commitments and deterministic snapshot fixtures need regeneration")
 
     def set_test_params(self):
         """Use the pregenerated, deterministic chain up to height 199."""

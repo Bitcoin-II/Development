@@ -52,16 +52,10 @@ struct CoinEntry {
     SERIALIZE_METHODS(CoinEntry, obj) { READWRITE(obj.key, obj.outpoint->hash, VARINT(obj.outpoint->n)); }
 };
 
-DBParams WithChainstateProfile(DBParams params)
-{
-    params.profile = DBProfile::CHAINSTATE;
-    return params;
-}
-
 } // namespace
 
 CCoinsViewDB::CCoinsViewDB(DBParams db_params, CoinsViewOptions options) :
-    m_db_params{WithChainstateProfile(std::move(db_params))},
+    m_db_params{std::move(db_params)},
     m_options{std::move(options)},
     m_db{std::make_unique<CDBWrapper>(m_db_params)} { }
 
@@ -131,7 +125,7 @@ void CCoinsViewDB::BatchWrite(CoinsViewCacheCursor& cursor, const uint256& hashB
         std::vector<uint256> old_heads = GetHeadBlocks();
         if (old_heads.size() == 2) {
             if (old_heads[0] != hashBlock) {
-                LogError("The coins database detected an inconsistent state, likely due to a previous crash or shutdown. You will need to restart bitcoinIId with the -reindex-chainstate or -reindex configuration option.\n");
+                LogError("The coins database detected an inconsistent state, likely due to a previous crash or shutdown. You will need to restart bitcoinII-d with the -reindex-chainstate or -reindex configuration option.\n");
             }
             assert(old_heads[0] == hashBlock);
             old_tip = old_heads[1];
@@ -240,7 +234,7 @@ std::unique_ptr<CCoinsViewCursor> CCoinsViewDB::Cursor() const
 {
     auto i = std::make_unique<CCoinsViewDBCursor>(
         const_cast<CDBWrapper&>(*m_db).NewIterator(), GetBestBlock());
-    /* The database wrapper does not expose const iterators.  Since we
+    /* It seems that there are no "const iterators" for LevelDB.  Since we
        only need read operations on it, use a const-cast to get around
        that restriction.  */
     i->pcursor->Seek(DB_COIN);

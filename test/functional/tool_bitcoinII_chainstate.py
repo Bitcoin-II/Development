@@ -13,7 +13,7 @@ snapshot and extend the snapshot chain with new blocks.
 
 import subprocess
 
-from test_framework.test_framework import BitcoinIITestFramework
+from test_framework.test_framework import BitcoinIITestFramework, SkipTest
 from test_framework.util import assert_equal
 from test_framework.wallet import MiniWallet
 
@@ -26,6 +26,7 @@ SNAPSHOT_BASE_BLOCK_HASH = "7cc695046fec709f8c9394b6f928f81e81fd3ac20977bb68760f
 class BitcoinIIChainstateTest(BitcoinIITestFramework):
     def skip_test_if_missing_module(self):
         self.skip_if_no_bitcoinII_chainstate()
+        raise SkipTest("Bitcoin Core pregenerated AssumeUTXO chainstate fixture is not valid for BitcoinII")
 
     def set_test_params(self):
         """Use the pregenerated, deterministic chain up to height 199."""

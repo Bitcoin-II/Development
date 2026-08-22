@@ -288,7 +288,7 @@ def from_binary(cls, stream):
     return obj
 
 
-# Objects that map to bitcoinIId objects, which can be serialized/deserialized
+# Objects that map to bitcoinII-d objects, which can be serialized/deserialized
 
 
 class CAddress:
@@ -446,7 +446,7 @@ class CInv:
         return r
 
     def __repr__(self):
-        return "CInv(type=%s hash=%064x)" \
+        return "CInv(type=%s hash=%064x)"\
             % (self.typemap[self.type], self.hash)
 
     def __eq__(self, other):
@@ -519,7 +519,7 @@ class CTxIn:
         return r
 
     def __repr__(self):
-        return "CTxIn(prevout=%s scriptSig=%s nSequence=%i)" \
+        return "CTxIn(prevout=%s scriptSig=%s nSequence=%i)"\
             % (repr(self.prevout), self.scriptSig.hex(),
                self.nSequence)
 
@@ -542,7 +542,7 @@ class CTxOut:
         return r
 
     def __repr__(self):
-        return "CTxOut(nValue=%i.%08i scriptPubKey=%s)" \
+        return "CTxOut(nValue=%i.%08i scriptPubKey=%s)"\
             % (self.nValue // COIN, self.nValue % COIN,
                self.scriptPubKey.hex())
 
@@ -555,7 +555,7 @@ class CScriptWitness:
         self.stack = []
 
     def __repr__(self):
-        return "CScriptWitness(%s)" % \
+        return "CScriptWitness(%s)" %\
                (",".join([x.hex() for x in self.stack]))
 
     def is_null(self):
@@ -603,7 +603,7 @@ class CTxWitness:
         return r
 
     def __repr__(self):
-        return "CTxWitness(%s)" % \
+        return "CTxWitness(%s)" %\
                (';'.join([repr(x) for x in self.vtxinwit]))
 
     def is_null(self):
@@ -637,7 +637,7 @@ class CTransaction:
         if len(self.vin) == 0:
             flags = int.from_bytes(f.read(1), "little")
             # Not sure why flags can't be zero, but this
-            # matches the implementation in bitcoinIId
+            # matches the implementation in bitcoinII-d
             if (flags != 0):
                 self.vin = deser_vector(f, CTxIn)
                 self.vout = deser_vector(f, CTxOut)
@@ -723,7 +723,7 @@ class CTransaction:
         return math.ceil(self.get_weight() / WITNESS_SCALE_FACTOR)
 
     def __repr__(self):
-        return "CTransaction(version=%i vin=%s vout=%s wit=%s nLockTime=%i)" \
+        return "CTransaction(version=%i vin=%s vout=%s wit=%s nLockTime=%i)"\
             % (self.version, repr(self.vin), repr(self.vout), repr(self.wit), self.nLockTime)
 
 
@@ -782,7 +782,7 @@ class CBlockHeader:
         return uint256_from_str(hash256(self._serialize_header()))
 
     def __repr__(self):
-        return "CBlockHeader(nVersion=%i hashPrevBlock=%064x hashMerkleRoot=%064x nTime=%s nBits=%08x nNonce=%08x)" \
+        return "CBlockHeader(nVersion=%i hashPrevBlock=%064x hashMerkleRoot=%064x nTime=%s nBits=%08x nNonce=%08x)"\
             % (self.nVersion, self.hashPrevBlock, self.hashMerkleRoot,
                time.ctime(self.nTime), self.nBits, self.nNonce)
 
@@ -861,7 +861,7 @@ class CBlock(CBlockHeader):
         return (WITNESS_SCALE_FACTOR - 1) * without_witness_size + with_witness_size
 
     def __repr__(self):
-        return "CBlock(nVersion=%i hashPrevBlock=%064x hashMerkleRoot=%064x nTime=%s nBits=%08x nNonce=%08x vtx=%s)" \
+        return "CBlock(nVersion=%i hashPrevBlock=%064x hashMerkleRoot=%064x nTime=%s nBits=%08x nNonce=%08x vtx=%s)"\
             % (self.nVersion, self.hashPrevBlock, self.hashMerkleRoot,
                time.ctime(self.nTime), self.nBits, self.nNonce, repr(self.vtx))
 
@@ -1169,7 +1169,7 @@ class msg_version:
         self.nStartingHeight = int.from_bytes(f.read(4), "little", signed=True)
 
         # Relay field is optional for version 70001 onwards
-        # But, unconditionally check it to match behaviour in bitcoinIId
+        # But, unconditionally check it to match behaviour in bitcoinII-d
         self.relay = int.from_bytes(f.read(1), "little")  # f.read(1) may return an empty b''
 
     def serialize(self):
@@ -1186,7 +1186,7 @@ class msg_version:
         return r
 
     def __repr__(self):
-        return 'msg_version(nVersion=%i nServices=%i nTime=%s addrTo=%s addrFrom=%s nNonce=0x%016X strSubVer=%s nStartingHeight=%i relay=%i)' \
+        return 'msg_version(nVersion=%i nServices=%i nTime=%s addrTo=%s addrFrom=%s nNonce=0x%016X strSubVer=%s nStartingHeight=%i relay=%i)'\
             % (self.nVersion, self.nServices, time.ctime(self.nTime),
                repr(self.addrTo), repr(self.addrFrom), self.nNonce,
                self.strSubVer, self.nStartingHeight, self.relay)
@@ -1317,7 +1317,7 @@ class msg_getblocks:
         return r
 
     def __repr__(self):
-        return "msg_getblocks(locator=%s hashstop=%064x)" \
+        return "msg_getblocks(locator=%s hashstop=%064x)"\
             % (repr(self.locator), self.hashstop)
 
 
@@ -1536,7 +1536,7 @@ class msg_getheaders:
         return r
 
     def __repr__(self):
-        return "msg_getheaders(locator=%s, stop=%064x)" \
+        return "msg_getheaders(locator=%s, stop=%064x)"\
             % (repr(self.locator), self.hashstop)
 
 
@@ -1550,7 +1550,7 @@ class msg_headers:
         self.headers = headers if headers is not None else []
 
     def deserialize(self, f):
-        # comment in bitcoinIId indicates these should be deserialized as blocks
+        # comment in bitcoinII-d indicates these should be deserialized as blocks
         blocks = deser_vector(f, CBlock)
         for x in blocks:
             self.headers.append(CBlockHeader(x))

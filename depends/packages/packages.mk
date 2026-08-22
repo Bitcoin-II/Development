@@ -1,4 +1,4 @@
-packages:=lz4 zstd rocksdb
+packages:=
 
 boost_packages = boost
 

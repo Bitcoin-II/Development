@@ -11,10 +11,10 @@ When using a hardware wallet, consult the manufacturer website for (alternative)
 Start BitcoinII Core:
 
 ```sh
-$ bitcoinIId -signer=../HWI/hwi.py
+$ bitcoinII-d -signer=../HWI/hwi.py
 ```
 
-`bitcoinII node` can also be substituted for `bitcoinIId`.
+`bitcoinII node` can also be substituted for `bitcoinII-d`.
 
 ### Device setup
 

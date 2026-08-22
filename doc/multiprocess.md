@@ -43,7 +43,7 @@ By default when `-DENABLE_IPC=ON` is enabled, the libmultiprocess sources at [..
 
 Recommended way to use multiprocess binaries is to invoke `bitcoinII` CLI like `bitcoinII -m node -debug=ipc` or `bitcoinII -m gui -printtoconsole -debug=ipc`.
 
-When the `-m` (`--multiprocess`) option is used the `bitcoinII` command will execute multiprocess binaries instead of monolithic ones (`bitcoinII-node` instead of `bitcoinIId`, and `bitcoinII-gui` instead of `bitcoinII-qt`). The multiprocess binaries can also be invoked directly, but this is not recommended as they may change or be renamed in the future, and they are not installed in the PATH.
+When the `-m` (`--multiprocess`) option is used the `bitcoinII` command will execute multiprocess binaries instead of monolithic ones (`bitcoinII-node` instead of `bitcoinII-d`, and `bitcoinII-gui` instead of `bitcoinII-qt`). The multiprocess binaries can also be invoked directly, but this is not recommended as they may change or be renamed in the future, and they are not installed in the PATH.
 
 The multiprocess binaries currently function the same as the monolithic binaries, except they support an `-ipcbind` option.
 

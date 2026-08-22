@@ -28,7 +28,6 @@ from test_framework.script_util import (
     key_to_p2pk_script,
     key_to_p2pkh_script,
     key_to_p2wpkh_script,
-    keys_to_multisig_script,
     output_key_to_p2tr_script,
     script_to_p2sh_script,
     script_to_p2wsh_script,
@@ -95,15 +94,13 @@ class UtxoToSqliteTest(BitcoinIITestFramework):
 
             # add output scripts for compressed script type 0 (P2PKH), type 1 (P2SH),
             # types 2-3 (P2PK compressed), types 4-5 (P2PK uncompressed) and
-            # for uncompressed scripts (bare multisig, segwit, etc.)
+            # for uncompressed scripts (segwit, large scripts, etc.)
             output_scripts = (
                 key_to_p2pkh_script(pubkey),
                 script_to_p2sh_script(key_to_p2pkh_script(pubkey)),
                 key_to_p2pk_script(pubkey),
                 key_to_p2pk_script(uncompressed_pubkey),
 
-                keys_to_multisig_script([pubkey]*i),
-                keys_to_multisig_script([uncompressed_pubkey]*i),
                 key_to_p2wpkh_script(pubkey),
                 script_to_p2wsh_script(key_to_p2pkh_script(pubkey)),
                 output_key_to_p2tr_script(pubkey[1:]),

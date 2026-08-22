@@ -155,15 +155,15 @@ static constexpr bool DEFAULT_I2P_ACCEPT_INCOMING{true};
 static constexpr bool DEFAULT_STOPAFTERBLOCKIMPORT{false};
 
 #ifdef WIN32
-// RocksDB on Windows does not use file descriptors, and the ones used for
+// Win32 LevelDB doesn't use filedescriptors, and the ones used for
 // accessing block files don't count towards the fd_set size limit
 // anyway.
-#define MIN_DATABASE_FDS 0
+#define MIN_LEVELDB_FDS 0
 #else
-#define MIN_DATABASE_FDS 150
+#define MIN_LEVELDB_FDS 150
 #endif
 
-static constexpr int MIN_CORE_FDS = MIN_DATABASE_FDS + NUM_FDS_MESSAGE_CAPTURE;
+static constexpr int MIN_CORE_FDS = MIN_LEVELDB_FDS + NUM_FDS_MESSAGE_CAPTURE;
 
 /**
  * The PID file facilities.
@@ -503,7 +503,7 @@ void SetupServerArgs(ArgsManager& argsman, bool can_listen_ipc)
     argsman.AddArg("-conf=<file>", strprintf("Specify path to read-only configuration file. Relative paths will be prefixed by datadir location (only useable from command line, not configuration file) (default: %s)", BITCOINII_CONF_FILENAME), ArgsManager::ALLOW_ANY, OptionsCategory::OPTIONS);
     argsman.AddArg("-datadir=<dir>", "Specify data directory", ArgsManager::ALLOW_ANY | ArgsManager::DISALLOW_NEGATION, OptionsCategory::OPTIONS);
     argsman.AddArg("-dbbatchsize", strprintf("Maximum database write batch size in bytes (default: %u)", DEFAULT_DB_CACHE_BATCH), ArgsManager::ALLOW_ANY | ArgsManager::DEBUG_ONLY, OptionsCategory::OPTIONS);
-    argsman.AddArg("-dbcache=<n>", strprintf("Maximum database cache size <n> MiB (minimum %d). If unset, BitcoinII automatically selects a performance-oriented value based on installed physical memory. In addition, unused memory allocated to the mempool is shared with this cache (see -maxmempool).", MIN_DB_CACHE >> 20), ArgsManager::ALLOW_ANY, OptionsCategory::OPTIONS);
+    argsman.AddArg("-dbcache=<n>", strprintf("Maximum database cache size <n> MiB (minimum %d, default: %d). Make sure you have enough RAM. In addition, unused memory allocated to the mempool is shared with this cache (see -maxmempool).", MIN_DB_CACHE >> 20, node::GetDefaultDBCache() >> 20), ArgsManager::ALLOW_ANY, OptionsCategory::OPTIONS);
     argsman.AddArg("-includeconf=<file>", "Specify additional configuration file, relative to the -datadir path (only useable from configuration file, not command line)", ArgsManager::ALLOW_ANY, OptionsCategory::OPTIONS);
     argsman.AddArg("-allowignoredconf", strprintf("For backwards compatibility, treat an unused %s file in the datadir as a warning, not an error.", BITCOINII_CONF_FILENAME), ArgsManager::ALLOW_ANY, OptionsCategory::OPTIONS);
     argsman.AddArg("-loadblock=<file>", "Imports blocks from external file on startup", ArgsManager::ALLOW_ANY, OptionsCategory::OPTIONS);
@@ -1821,122 +1821,21 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
 
     // cache size calculations
     node::LogOversizedDbCache(args);
-
-    const node::CacheSizes cache_sizes{
-        CalculateCacheSizes(
-            args,
-            g_enabled_filter_types.size()
-        )
-    };
-
-    const auto& index_cache_sizes{
-        cache_sizes.index
-    };
-
-    const auto& kernel_cache_sizes{
-        cache_sizes.kernel
-    };
-
-    if (cache_sizes.automatic) {
-        if (cache_sizes.physical_memory) {
-            LogInfo(
-                "Automatic database cache selected: "
-                "%.1f MiB from %.1f MiB physical memory",
-                cache_sizes.total / 1048576.0,
-                *cache_sizes.physical_memory / 1048576.0
-            );
-        } else {
-            LogInfo(
-                "Automatic database cache selected: "
-                "%.1f MiB "
-                "(physical-memory detection unavailable; "
-                "using fallback)",
-                cache_sizes.total / 1048576.0
-            );
-        }
-    } else {
-        LogInfo(
-            "User-specified database cache selected: %.1f MiB",
-            cache_sizes.total / 1048576.0
-        );
-    }
-
-    LogInfo(
-        "Database tuning profile: %s "
-        "(%d logical processors)",
-        cache_sizes.high_end
-            ? "high-end"
-            : "standard",
-        cache_sizes.hardware_threads
-    );
+    const auto [index_cache_sizes, kernel_cache_sizes] = CalculateCacheSizes(args, g_enabled_filter_types.size());
 
     LogInfo("Cache configuration:");
-
-    LogInfo(
-        "* Using %.1f MiB for block index database",
-        kernel_cache_sizes.block_tree_db *
-            (1.0 / 1024 / 1024)
-    );
-
-    if (
-        args.GetBoolArg(
-            "-txindex",
-            DEFAULT_TXINDEX
-        )
-    ) {
-        LogInfo(
-            "* Using %.1f MiB for transaction index database",
-            index_cache_sizes.tx_index *
-                (1.0 / 1024 / 1024)
-        );
+    LogInfo("* Using %.1f MiB for block index database", kernel_cache_sizes.block_tree_db * (1.0 / 1024 / 1024));
+    if (args.GetBoolArg("-txindex", DEFAULT_TXINDEX)) {
+        LogInfo("* Using %.1f MiB for transaction index database", index_cache_sizes.tx_index * (1.0 / 1024 / 1024));
     }
-
-    if (
-        args.GetBoolArg(
-            "-txospenderindex",
-            DEFAULT_TXOSPENDERINDEX
-        )
-    ) {
-        LogInfo(
-            "* Using %.1f MiB for transaction output "
-            "spender index database",
-            index_cache_sizes.txospender_index *
-                (1.0 / 1024 / 1024)
-        );
+    if (args.GetBoolArg("-txospenderindex", DEFAULT_TXOSPENDERINDEX)) {
+        LogInfo("* Using %.1f MiB for transaction output spender index database", index_cache_sizes.txospender_index * (1.0 / 1024 / 1024));
     }
-
-    for (
-        BlockFilterType filter_type :
-        g_enabled_filter_types
-    ) {
-        LogInfo(
-            "* Using %.1f MiB for %s block filter "
-            "index database",
-            index_cache_sizes.filter_index *
-                (1.0 / 1024 / 1024),
-            BlockFilterTypeName(filter_type)
-        );
+    for (BlockFilterType filter_type : g_enabled_filter_types) {
+        LogInfo("* Using %.1f MiB for %s block filter index database",
+                  index_cache_sizes.filter_index * (1.0 / 1024 / 1024), BlockFilterTypeName(filter_type));
     }
-
-    if (
-        args.GetBoolArg(
-            "-coinstatsindex",
-            DEFAULT_COINSTATSINDEX
-        )
-    ) {
-        LogInfo(
-            "* Using %.1f MiB for coin statistics "
-            "index database",
-            index_cache_sizes.coin_stats_index *
-                (1.0 / 1024 / 1024)
-        );
-    }
-
-    LogInfo(
-        "* Using %.1f MiB for chain state database",
-        kernel_cache_sizes.coins_db *
-            (1.0 / 1024 / 1024)
-    );
+    LogInfo("* Using %.1f MiB for chain state database", kernel_cache_sizes.coins_db * (1.0 / 1024 / 1024));
 
     assert(!node.mempool);
     assert(!node.chainman);
@@ -2011,12 +1910,7 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
     }
 
     if (args.GetBoolArg("-coinstatsindex", DEFAULT_COINSTATSINDEX)) {
-        g_coin_stats_index = std::make_unique<CoinStatsIndex>(
-            interfaces::MakeChain(node),
-            index_cache_sizes.coin_stats_index,
-            false,
-            do_reindex
-        );
+        g_coin_stats_index = std::make_unique<CoinStatsIndex>(interfaces::MakeChain(node), /*cache_size=*/0, false, do_reindex);
         node.indexes.emplace_back(g_coin_stats_index.get());
     }
 

@@ -2,7 +2,7 @@
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or https://opensource.org/license/mit/.
 
-# Wallet functionality used by bitcoinIId and bitcoinII-wallet executables.
+# Wallet functionality used by bitcoinII-d and bitcoinII-wallet executables.
 add_library(bitcoinII_wallet STATIC EXCLUDE_FROM_ALL
   coincontrol.cpp
   coinselection.cpp

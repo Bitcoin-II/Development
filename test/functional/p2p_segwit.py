@@ -688,7 +688,7 @@ class SegWitTest(BitcoinIITestFramework):
         # This transaction should not be accepted into the mempool pre- or
         # post-segwit.  Mempool acceptance will use SCRIPT_VERIFY_WITNESS which
         # will require a witness to spend a witness program regardless of
-        # segwit activation.  Note that older bitcoinIId's that are not
+        # segwit activation.  Note that older bitcoinII-d's that are not
         # segwit-aware would also reject this for failing CLEANSTACK.
         with self.nodes[0].assert_debug_log(
                 expected_msgs=[spend_tx.txid_hex, 'was not accepted: mempool-script-verify-flag-failed (Witness program was passed an empty witness)']):
@@ -965,7 +965,7 @@ class SegWitTest(BitcoinIITestFramework):
         assert_equal('bad-witness-merkle-match', self.nodes[0].submitblock(block.serialize().hex()))
         assert_not_equal(self.nodes[0].getbestblockhash(), block.hash_hex)
 
-        # Now redo commitment with the standard nonce, but let bitcoinIId fill it in.
+        # Now redo commitment with the standard nonce, but let bitcoinII-d fill it in.
         # BitcoinII permits only one OP_RETURN output per transaction, so
         # replace the previous witness commitment instead of appending another.
         block.vtx[0].vout.pop()

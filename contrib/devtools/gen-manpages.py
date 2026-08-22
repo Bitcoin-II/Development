@@ -11,7 +11,7 @@ import argparse
 
 BINARIES = [
 'bin/bitcoinII',
-'bin/bitcoinIId',
+'bin/bitcoinII-d',
 'bin/bitcoinII-cli',
 'bin/bitcoinII-tx',
 'bin/bitcoinII-wallet',

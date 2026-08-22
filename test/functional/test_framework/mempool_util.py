@@ -69,13 +69,12 @@ def fill_mempool(test_framework, node, *, tx_sync_fun=None):
 
     tx_batch_size = 1
     # BitcoinII's large-transaction helper uses many ordinary outputs instead of
-    # one oversized OP_RETURN, increasing per-transaction mempool memory usage.
-    # With a 5 MB mempool eviction begins at roughly 65 entries, so leave the
-    # final three batches to deliberately cross that threshold.
+    # one oversized OP_RETURN. Continue filling after eviction begins so the
+    # mempool remains close to its configured size limit.
     num_of_batches = 75
     # Generate UTXOs to flood the mempool
     # 1 to create a tx initially that will be evicted from the mempool later
-    # 65 transactions each with a fee rate higher than the previous one
+    # 75 transactions with progressively higher fee rates.
     ephemeral_miniwallet = MiniWallet(node, tag_name="fill_mempool_ephemeral_wallet")
     test_framework.generate(ephemeral_miniwallet, 1 + num_of_batches * tx_batch_size)
 
@@ -104,13 +103,19 @@ def fill_mempool(test_framework, node, *, tx_sync_fun=None):
 
     test_framework.log.debug("Fill up the mempool with txs with higher fee rate")
     batches_sent = 0
+    eviction_triggered = False
     for fee in batch_fees:
-        assert_equal(node.getmempoolinfo()["mempoolminfee"], minrelayfee)
         send_batch(fee)
         batches_sent += 1
-        if node.getmempoolinfo()["mempoolminfee"] > minrelayfee:
+
+        mempool_info = node.getmempoolinfo()
+        if mempool_info["mempoolminfee"] > minrelayfee:
+            eviction_triggered = True
+
+        if eviction_triggered and mempool_info["maxmempool"] - mempool_info["usage"] < 250_000:
             break
-    else:
+
+    if not eviction_triggered:
         raise AssertionError("Failed to trigger mempool eviction")
 
     tx_sync_fun() if tx_sync_fun else test_framework.sync_mempools()

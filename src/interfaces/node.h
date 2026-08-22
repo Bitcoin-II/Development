@@ -65,7 +65,7 @@ public:
     virtual std::string getName() = 0;
 };
 
-//! Top-level interface for a bitcoinII node (bitcoinIId process).
+//! Top-level interface for a bitcoinII node (bitcoinII-d process).
 class Node
 {
 public:

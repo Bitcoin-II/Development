@@ -88,7 +88,7 @@ pypy3 contrib/devtools/headerssync-params.py
 gen-bitcoinII-conf.sh
 ===================
 
-Generates a bitcoinII.conf file in `share/examples/` by parsing the output from `bitcoinIId --help`. This script is run during the
+Generates a bitcoinII.conf file in `share/examples/` by parsing the output from `bitcoinII-d --help`. This script is run during the
 release process to include a bitcoinII.conf with the release binaries and can also be run by users to generate a file locally.
 When generating a file as part of the release process, make sure to commit the changes after running the script.
 

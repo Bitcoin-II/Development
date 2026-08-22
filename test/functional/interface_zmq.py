@@ -114,7 +114,7 @@ class ZMQTest (BitcoinIITestFramework):
 
     def skip_test_if_missing_module(self):
         self.skip_if_no_py3_zmq()
-        self.skip_if_no_bitcoinIId_zmq()
+        self.skip_if_no_bitcoinII_d_zmq()
 
     def run_test(self):
         self.wallet = MiniWallet(self.nodes[0])

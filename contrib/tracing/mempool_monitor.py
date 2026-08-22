@@ -121,16 +121,16 @@ int trace_replaced(struct pt_regs *ctx) {
 
 
 def main(pid):
-    print(f"Hooking into bitcoinIId with pid {pid}")
-    bitcoinIId_with_usdts = USDT(pid=int(pid))
+    print(f"Hooking into bitcoinII-d with pid {pid}")
+    bitcoinII_d_with_usdts = USDT(pid=int(pid))
 
     # attaching the trace functions defined in the BPF program
     # to the tracepoints
-    bitcoinIId_with_usdts.enable_probe(probe="mempool:added", fn_name="trace_added")
-    bitcoinIId_with_usdts.enable_probe(probe="mempool:removed", fn_name="trace_removed")
-    bitcoinIId_with_usdts.enable_probe(probe="mempool:replaced", fn_name="trace_replaced")
-    bitcoinIId_with_usdts.enable_probe(probe="mempool:rejected", fn_name="trace_rejected")
-    bpf = BPF(text=PROGRAM, usdt_contexts=[bitcoinIId_with_usdts])
+    bitcoinII_d_with_usdts.enable_probe(probe="mempool:added", fn_name="trace_added")
+    bitcoinII_d_with_usdts.enable_probe(probe="mempool:removed", fn_name="trace_removed")
+    bitcoinII_d_with_usdts.enable_probe(probe="mempool:replaced", fn_name="trace_replaced")
+    bitcoinII_d_with_usdts.enable_probe(probe="mempool:rejected", fn_name="trace_rejected")
+    bpf = BPF(text=PROGRAM, usdt_contexts=[bitcoinII_d_with_usdts])
 
     events = []
 
@@ -372,7 +372,7 @@ class Dashboard:
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("USAGE: ", sys.argv[0], "<pid of bitcoinIId>")
+        print("USAGE: ", sys.argv[0], "<pid of bitcoinII-d>")
         exit(1)
 
     pid = sys.argv[1]
