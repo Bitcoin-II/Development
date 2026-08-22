@@ -614,8 +614,8 @@ public:
             {
                 // For use by test/functional/feature_assumeutxo.py and test/functional/tool_bitcoinII_chainstate.py
                 .height = 299,
-                .hash_serialized = AssumeutxoHash{uint256{"ce08992adc3d3cc5ce7e064734b1e5510c884ad0a9c084274fc67181b49fb259"}},
-                .m_chain_tx_count = 300,
+                .hash_serialized = AssumeutxoHash{uint256{"d2b051ff5e8eef46520350776f4100dd710a63447a8e01d917e92e79751a63e2"}},
+                .m_chain_tx_count = 334,
                 .blockhash = uint256{"03befe639f0e69178bd1472e1a474b1d252078c2c6aae5ba10e9d6083c541009"},
             },
         };

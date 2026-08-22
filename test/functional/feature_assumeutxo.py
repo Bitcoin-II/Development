@@ -165,7 +165,7 @@ class AssumeutxoTest(BitcoinIITestFramework):
                 f.write(content)
                 f.write(valid_snapshot_contents[(5 + 2 + 4 + 32 + 8 + offset + len(content)):])
 
-            msg = custom_message if custom_message is not None else f"Bad snapshot content hash: expected ce08992adc3d3cc5ce7e064734b1e5510c884ad0a9c084274fc67181b49fb259, got {wrong_hash}."
+            msg = custom_message if custom_message is not None else f"Bad snapshot content hash: expected d2b051ff5e8eef46520350776f4100dd710a63447a8e01d917e92e79751a63e2, got {wrong_hash}."
             expected_error(msg)
 
     def test_headers_not_synced(self, valid_snapshot_path):
